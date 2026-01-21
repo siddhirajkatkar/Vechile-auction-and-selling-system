@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 @Validated
 @Slf4j
 public class UserController {
@@ -26,7 +26,7 @@ public class UserController {
 	private UserService userService;
 	@PostMapping("/login")
 	public ResponseEntity<?>authUser(@Valid @RequestBody AuthRequestDto user){
-		
+		System.out.println("LOGIN REQUEST RECEIVED: " + user.getEmail());
 		return ResponseEntity.ok(userService.authenticate(user));
 		
 	}
