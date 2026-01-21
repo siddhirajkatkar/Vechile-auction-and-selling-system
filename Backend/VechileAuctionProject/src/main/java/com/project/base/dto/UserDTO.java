@@ -1,6 +1,7 @@
 package com.project.base.dto;
 
 import com.project.base.pojo.Role;
+import com.project.base.pojo.RoleName;
 import com.project.base.pojo.UserStatus;
 
 import jakarta.persistence.Column;
@@ -18,6 +19,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class UserDTO {
 
 	
@@ -34,6 +36,6 @@ public class UserDTO {
 
     private String address;
 
-    private Role role;
+    private RoleName role;
 
 }

@@ -9,11 +9,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cdac</groupId>
-	<artifactId>healthcare_backend_security_jwt</artifactId>
+	<artifactId>VehicalAuctionProject</artifactId>
 	<version>0.0.1</version>
-	<name>healthcare_backend_security_jwt</name>
-	<description>Spring Boot based Healthcare Backend with Spring security DB
-		based user details and JWT</description>
+	<name>VehicalAuctionProject</name>
+	<description>Spring Boot based Healthcare Backend In memory and Basic Auth scheme</description>
 	<url />
 	<licenses>
 		<license />
@@ -88,23 +87,9 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-api</artifactId>
-			<version>0.13.0</version>
-		</dependency>
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-impl</artifactId>
-			<version>0.13.0</version>
-		</dependency>
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-jackson</artifactId>
-			<version>0.13.0</version>
-		</dependency>
+	
 	</dependencies>
+
 
 	<build>
 		<plugins>

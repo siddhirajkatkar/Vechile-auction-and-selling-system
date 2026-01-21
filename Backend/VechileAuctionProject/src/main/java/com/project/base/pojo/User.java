@@ -73,8 +73,8 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+//    @PrePersist
+//    protected void onCreate() {
+//        this.createdAt = LocalDateTime.now();
+//    }
 }

@@ -1,8 +1,7 @@
 package com.project.base.pojo;
 
 public enum RoleName {
-	    ADMIN,
-	    SELLER,
-	    BUYER
-
+	  ROLE_ADMIN,
+	    ROLE_SELLER,
+	    ROLE_BUYER
 }

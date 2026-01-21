@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.base.dto.UserDTO;
+import com.project.base.exception.ApiException;
 import com.project.base.services.UserService;
 import com.project.base.services.UserServicesImpl;
 
@@ -15,8 +16,8 @@ import com.project.base.services.UserServicesImpl;
 public class UserController {
 	@Autowired
 	private UserService userService;
-	@PostMapping
-	public ResponseEntity<?> RegisterUser(@RequestBody UserDTO userDto){
+	@PostMapping("/register")
+	public ResponseEntity<?> RegisterUser(@RequestBody UserDTO userDto) throws ApiException{
 		
 		
 		return ResponseEntity.status(HttpStatus.CREATED)
