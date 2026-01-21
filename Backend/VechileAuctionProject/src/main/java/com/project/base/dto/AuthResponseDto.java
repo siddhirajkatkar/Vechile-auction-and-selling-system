@@ -1,6 +1,7 @@
 package com.project.base.dto;
 
-import com.healthcare.entities.UserRole;
+//import com.healthcare.entities.UserRole;
+import com.project.base.pojo.Role;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ public class AuthResponseDto {
 	private String firstName;	
 	private String lastName;	
 	private String email;
-	private UserRole userRole;
+	private Role userRole;
 	private String message;
 
 }
