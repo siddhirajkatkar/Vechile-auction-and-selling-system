@@ -2,7 +2,7 @@ package com.project.base.services;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +21,9 @@ import lombok.RequiredArgsConstructor;
 public class UserServicesImpl implements UserService {
 	
 	@Autowired
-	public UserRepository userRepository;
+	public UserRepository userRepo;
 	private final ModelMapper modelMapper;
-	private PasswordEncoder passwordEncoder;
+//	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public AuthResponseDto authenticate(AuthRequestDto dto) {
@@ -38,15 +38,15 @@ public class UserServicesImpl implements UserService {
 	
 	
 	
-	public String RegisterUser(UserDTO userDto) {
+	public String RegisterUser(UserDTO userDto) throws ApiException {
 		
-		if(userRepository.existsByEmail(userDto.getEmail()))
+		if(userRepo.existsByEmail(userDto.getEmail()))
 			throw new ApiException("Email Alredy Exist");
 		
 		User user=modelMapper.map(userDto,User.class);
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		user.setPassword(user.getPassword());
 		
-		User userPersistentEntity=userRepository.save(user);
+		User userPersistentEntity=userRepo.save(user);
 		
 		return "successfully register";
 		
