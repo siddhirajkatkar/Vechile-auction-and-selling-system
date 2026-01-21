@@ -1,12 +1,15 @@
-import Login from "../../app/src/components/LoginForm"
-import "bootstrap/dist/css/bootstrap.min.css";
-
-import './App.css'
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Home from "./components/Home";
+import Login from "./components/LoginForm";
 
 function App() {
-  
-
-  return <Login/>
-
+  return (
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/home" element={<Home />} />
+    </Routes>
+  );
 }
+
 export default App;
