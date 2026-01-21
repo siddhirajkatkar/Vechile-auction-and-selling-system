@@ -1,6 +1,5 @@
 package com.project.base.dto;
 
-//import com.healthcare.entities.UserRole;
 import com.project.base.pojo.RoleName;
 
 import lombok.Getter;

@@ -1,7 +1,5 @@
 package com.project.base.services;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,29 +15,27 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class UserServicesImpl implements UserService {
-	
-	public UserRepository userRepo;
-	private final ModelMapper modelMapper;
-	private PasswordEncoder passwordEncoder;
 
-	@Override
-	public AuthResponseDto authenticate(AuthRequestDto dto) {
-		// TODO Auto-generated method stub
-		 User user = userRepo.findByEmail(dto.getEmail())
-	                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
-	        
-	        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-	            throw new RuntimeException("Invalid email or password");
-	        }	        
-	        if (user.getStatus() != UserStatus.ACTIVE) {
-	            throw new RuntimeException("User account is not active");
-	        }	       
-	        AuthResponseDto response = modelMapper.map(user, AuthResponseDto.class);
-	        response.setMessage("Successful Login!");
+    private final UserRepository userRepo;
 
-	        return response;
-	}
-	
-	
+    @Override
+    public AuthResponseDto authenticate(AuthRequestDto dto) {
 
+        User user = userRepo.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+
+        if (!dto.getPassword().equals(user.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new RuntimeException("User account is not active");
+        }
+
+        AuthResponseDto response = new AuthResponseDto();
+        response.setEmail(user.getEmail());
+        response.setMessage("Successful Login!");
+
+        return response;
+    }
 }
