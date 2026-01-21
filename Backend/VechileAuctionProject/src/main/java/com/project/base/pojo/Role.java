@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
-
 @Entity
 @Table(name = "roles")
 @NoArgsConstructor
@@ -20,13 +19,10 @@ public class Role {
     @Column(name = "role_id")
     private Long roleId;
 
+    @Enumerated(EnumType.STRING)   // ✅ THIS FIXES THE ERROR
     @Column(name = "role_name", nullable = false, unique = true)
-    private String roleName;
+    private RoleName roleName;
 
     @ManyToMany(mappedBy = "roles")
     private Set<User> users = new HashSet<>();
-
-    public Role(String roleName) {
-        this.roleName = roleName;
-    }
 }

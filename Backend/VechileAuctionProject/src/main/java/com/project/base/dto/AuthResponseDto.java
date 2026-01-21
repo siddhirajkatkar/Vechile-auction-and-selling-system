@@ -17,7 +17,7 @@ public class AuthResponseDto {
 	private String email;
 	private Role userRole;
 
-	private RoleName userRole;
+	private RoleName userRoleName;
 	private String message;
 
 }
