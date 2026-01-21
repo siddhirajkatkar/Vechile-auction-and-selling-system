@@ -1,7 +1,6 @@
 package com.project.base.services;
 
 import java.util.Optional;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +18,6 @@ import com.project.base.pojo.User;
 import com.project.base.pojo.UserStatus;
 import com.project.base.repository.RoleRepository;
 import com.project.base.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @Service

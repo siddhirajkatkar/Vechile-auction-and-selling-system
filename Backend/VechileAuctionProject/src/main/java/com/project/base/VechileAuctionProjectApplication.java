@@ -4,10 +4,12 @@ package com.project.base;
 //import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 //import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 @SpringBootApplication
 public class VechileAuctionProjectApplication {
@@ -15,6 +17,7 @@ public class VechileAuctionProjectApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(VechileAuctionProjectApplication.class, args);
 		
+
 //		@Bean//method level annotation - to declare a method returning java object
 //		 ModelMapper modelMapper()
 //		{
@@ -32,6 +35,9 @@ public class VechileAuctionProjectApplication {
 //		public PasswordEncoder paswwordEncoder() {
 //			return new BCryptPasswordEncoder();
 //		}
-	}
 
+	}
+	
 }
+		
+

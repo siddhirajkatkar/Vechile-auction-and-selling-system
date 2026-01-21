@@ -8,13 +8,14 @@
 		<version>3.5.8</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.cdac</groupId>
-	<artifactId>VehicalAuctionProject</artifactId>
-	<version>0.0.1</version>
-	<name>VehicalAuctionProject</name>
-	<description>Spring Boot based Healthcare Backend In memory and Basic Auth scheme</description>
-	<url />
-	<licenses>
+	<groupId>com.example</groupId>
+	<artifactId>VechileAuctionProject</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>VechileAuctionProject</name>
+	<description>CDAC Final Project </description>
+	<url/>
+<licenses>
+
 		<license />
 	</licenses>
 	<developers>
@@ -83,11 +84,12 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
+
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-	
+		
+		
 	</dependencies>
 
 
