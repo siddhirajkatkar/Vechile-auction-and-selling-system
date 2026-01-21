@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,14 +13,16 @@ import lombok.Setter;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor // JPA requirement
+@AllArgsConstructor
 @Getter
 @Setter
-public class User {
+@AttributeOverride(name="id",column = @Column(name="user_id"))
+public class User extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long userId;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(name = "user_id")
+//    private Long userId;
 
     @Column(name = "first_name", length = 100)
     private String firstName;
@@ -52,8 +55,8 @@ public class User {
     @Column(name = "status")
     private UserStatus status = UserStatus.ACTIVE;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+//    @Column(name = "created_at", updatable = false)
+//    private LocalDateTime createdAt;
 
     //Business constructor (User Registration)
     public User(String firstName,
@@ -77,8 +80,8 @@ public class User {
         this.password = password;
     }
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+//    @PrePersist
+//    protected void onCreate() {
+//        this.createdAt = LocalDateTime.now();
+//    }
 }
