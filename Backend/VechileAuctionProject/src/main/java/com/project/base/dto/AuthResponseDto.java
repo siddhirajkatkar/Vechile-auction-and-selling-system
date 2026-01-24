@@ -13,13 +13,13 @@ import lombok.Setter;
 @AllArgsConstructor
 
 public class AuthResponseDto {
-	private Long id;
-	private String firstName;	
-	private String lastName;	
-	private String email;
-	private Role userRole;
 
-	private RoleName userRoleName;
-	private String message;
-
+    private Long userId;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String role;   // ✅ String, not Role entity
+    private String message;
 }
+
+

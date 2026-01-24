@@ -62,8 +62,7 @@ public class AuthServiceImpl implements AuthService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                role,
-                role.getRoleName(),
+                role.getRoleName().name(),
                 "Login successful"
         );
     }
