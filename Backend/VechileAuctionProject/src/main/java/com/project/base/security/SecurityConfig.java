@@ -9,6 +9,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @Configuration
 public class SecurityConfig {
 
@@ -22,7 +23,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+
             // Disable CSRF (JWT-based auth)
+
+            // ✅ ENABLE CORS (THIS WAS MISSING)
+            .cors(cors -> {})
+
+            // Disable CSRF
             .csrf(csrf -> csrf.disable())
 
             // Stateless session
@@ -72,3 +79,5 @@ Consider defining a bean of type 'org.springframework.security.authentication.Au
         return configuration.getAuthenticationManager();
     }
 }
+
+
