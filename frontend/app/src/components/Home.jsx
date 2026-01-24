@@ -19,7 +19,7 @@ function Home() {
           >
             Login
           </button>
-          <button className="btn btn-warning">Register</button>
+          <button className="btn btn-warning" onClick={()=>navigate("/register")}>Register</button>
         </div>
       </nav>
 

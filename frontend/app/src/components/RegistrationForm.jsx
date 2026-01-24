@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { registerUser } from "../services/Registration";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
 
@@ -10,7 +11,7 @@ const Register = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [role, setRole] = useState("ROLE_BUYER"); // default
-
+  const navigate=useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -25,8 +26,13 @@ const Register = () => {
     };
 
     registerUser(userData)
-      .then(() => alert("Registration successful"))
+      .then(() =>{ 
+        alert("Registration successful") 
+        navigate("/login");
+
+      })  
       .catch(() => alert("Registration failed"));
+
   };
 
   return (
@@ -79,7 +85,7 @@ const Register = () => {
                   onChange={(e) => setAddress(e.target.value)} />
 
                 {/* Role Selection */}
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <label className="form-label">Register As</label>
 
                   <div className="form-check">
@@ -105,7 +111,7 @@ const Register = () => {
                     />
                     <label className="form-check-label">Seller</label>
                   </div>
-                </div>
+                </div> */}
 
                 <button className="btn btn-primary w-100">
                   Register
