@@ -49,7 +49,7 @@ const Home = () => {
             </button>
             <button
               className="btn btn-outline-secondary"
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/login")}
             >
               Sell Vehicle
             </button>

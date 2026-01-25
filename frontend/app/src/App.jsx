@@ -4,6 +4,9 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/public/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import AdminDashboard from "./pages/admin/AdminDashBoard";
+import UserDashboard from "./pages/user/UserDashBoard";
+
 
 function App() {
   return (
@@ -11,6 +14,8 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/user/dashboard" element={<UserDashboard />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
     </Routes>
   );
 }

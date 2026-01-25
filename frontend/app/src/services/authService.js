@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8080/api/auth";
+const API_BASE_URL = "http://localhost:8080";
 
-// Login
+// LOGIN (if you add it later)
 export const login = async (email, password) => {
   const response = await axios.post(
-    `${API_BASE_URL}/login`,
+    `${API_BASE_URL}/auth/login`,
     { email, password },
     {
       headers: {
@@ -14,15 +14,15 @@ export const login = async (email, password) => {
     }
   );
 
-  return response.data; // { token, role, userId }
+  return response.data;
 };
 
-// Register
+// REGISTER (THIS MATCHES BACKEND)
 export const register = async (userData) => {
-  return axios.post(`${API_BASE_URL}/register`, userData);
+  return axios.post(`${API_BASE_URL}/user/register`, userData);
 };
 
-// Logout
+// LOGOUT
 export const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
