@@ -1,12 +1,12 @@
 import axios from "axios";
 
+const API_BASE_URL = "http://localhost:8080/api/auth";
+
+// Login
 export const login = async (email, password) => {
   const response = await axios.post(
-    "http://localhost:8080/user/login",
-    {
-      email,
-      password
-    },
+    `${API_BASE_URL}/login`,
+    { email, password },
     {
       headers: {
         "Content-Type": "application/json"
@@ -14,8 +14,16 @@ export const login = async (email, password) => {
     }
   );
 
-  console.log("Login response:", response.data);
+  return response.data; // { token, role, userId }
+};
 
-  // ✅ THIS LINE FIXES EVERYTHING
-  return response.data;
+// Register
+export const register = async (userData) => {
+  return axios.post(`${API_BASE_URL}/register`, userData);
+};
+
+// Logout
+export const logout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
 };
