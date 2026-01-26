@@ -11,27 +11,32 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const data = await login(email, password);
+  try {
+    const data = await login(email, password);
 
-      // Store auth data
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
+    console.log("LOGIN RESPONSE:", data);
+    console.log("ROLE FROM BACKEND:", data.role);
+// Clean old data
+localStorage.clear();
 
-      setMessage("Login Successful");
+// Save new data
+localStorage.setItem("token", data.token);
+localStorage.setItem("role", data.role);
 
-      // Role-based redirection
-      if (data.role === "ADMIN") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/user/dashboard");
-      }
-    } catch (error) {
-      setMessage("Login failed. Check your email or password.");
-    }
-  };
+// Role-based redirection
+if (data.role === "ROLE_ADMIN") {
+  navigate("/admin/dashboard", { replace: true });
+} else {
+  navigate("/user/dashboard", { replace: true });
+}
+
+  } catch (error) {
+    setMessage("Login failed. Check your email or password.");
+  }
+};
+
 
   return (
     <div className="d-flex flex-column vh-100">
@@ -81,6 +86,18 @@ const Login = () => {
             <button className="btn btn-primary w-100" type="submit">
               Login
             </button>
+
+            {/* Register Link */}
+            <div className="text-center mt-3">
+              <span className="text-muted">Don’t have an account? </span>
+              <span
+                className="text-primary fw-bold"
+                style={{ cursor: "pointer" }}
+                onClick={() => navigate("/register")}
+              >
+                Register
+              </span>
+            </div>
           </form>
         </div>
       </div>
