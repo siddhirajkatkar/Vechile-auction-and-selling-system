@@ -2,10 +2,8 @@ package com.project.base.dto;
 
 import com.project.base.pojo.FuelType;
 import com.project.base.pojo.SaleType;
-import com.project.base.pojo.Status;
 import com.project.base.pojo.Transmission;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -32,31 +30,25 @@ public class CarDto {
     @NotNull(message = "Fuel type must be provided")
     private FuelType fuel_type;
 
-
-//    @PositiveOrZero(message = "KM driven must be 0 or greater")
-//    private int km_driven;
+    @NotNull(message = "Transmission must be provided")
+    private Transmission transmission;
 
     @PositiveOrZero(message = "Price must be 0 or greater")
     private double price;
-    @Column(nullable = false)
-    private Transmission transmission;
-    
+
     @NotNull(message = "Sale type must be provided")
     private SaleType sale_type;
-    @Column
+
+    @PositiveOrZero(message = "Mileage must be 0 or greater")
     private Integer mileage;
-    
-//    @NotBlank(message = "Manufacturer is required")
-//    private String manufacturer;
 
-//    @NotNull(message = "Status must be provided")
-//    private Status status;
-
-    // Optional fields — can be validated further if needed
+    @PositiveOrZero(message = "Manufacture year must be valid")
     private Integer manufacture_year;
+
     private String color;
+
+    @PositiveOrZero(message = "Engine CC must be 0 or greater")
     private Integer engine_cc;
-    
 
     private String description;
 }

@@ -1,7 +1,5 @@
 package com.project.base.services.impl;
 
-import java.util.Set;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,7 +28,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponseDto authenticate(AuthRequestDto request) {
 
-        // 1️⃣ Authenticate credentials using Spring Security
         Authentication authentication =
                 authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(
@@ -39,16 +36,13 @@ public class AuthServiceImpl implements AuthService {
                         )
                 );
 
-        // 2️⃣ Generate JWT after successful authentication
         String token = jwtUtil.createToken(authentication);
 
-        // 3️⃣ Load full User entity from DB
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
                         new RuntimeException("User not found with email: " + request.getEmail())
                 );
 
-        // 4️⃣ Extract primary role (for navigation / response)
         Role role = user.getRoles()
                 .stream()
                 .findFirst()
@@ -56,13 +50,14 @@ public class AuthServiceImpl implements AuthService {
                         new RuntimeException("Role not assigned to user")
                 );
 
-        // 5️⃣ Build and return response DTO
+        // ✅ FIXED ORDER
         return new AuthResponseDto(
                 user.getId(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
                 role.getRoleName().name(),
+                token,
                 "Login successful"
         );
     }
