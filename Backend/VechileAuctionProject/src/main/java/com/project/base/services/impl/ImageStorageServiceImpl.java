@@ -1,4 +1,4 @@
-package com.project.base.services;
+package com.project.base.services.impl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,7 +10,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.base.services.impl.ImageStorageService;
+import com.project.base.services.ImageStorageService;
+
 //import com.sun.tools.javac.util.StringUtils;
 import org.springframework.util.StringUtils;
 

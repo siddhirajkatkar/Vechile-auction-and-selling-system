@@ -1,4 +1,4 @@
-package com.project.base.services.impl;
+package com.project.base.services;
 
 import java.io.IOException;
 import java.util.List;

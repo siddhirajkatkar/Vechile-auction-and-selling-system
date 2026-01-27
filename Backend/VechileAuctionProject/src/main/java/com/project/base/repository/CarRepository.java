@@ -1,10 +1,13 @@
 package com.project.base.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import com.project.base.pojo.Car;
-@Repository
+import com.project.base.pojo.Status;
+
 public interface CarRepository extends JpaRepository<Car, Long> {
-		
+
+    List<Car> findByStatus(Status status);
 }

@@ -16,7 +16,7 @@ import com.project.base.pojo.User;
 import com.project.base.repository.CarRepository;
 import com.project.base.repository.UserRepository;
 import com.project.base.services.CarService;
-import com.project.base.services.impl.ImageStorageService;
+import com.project.base.services.ImageStorageService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +29,7 @@ public class CarServiceImpl implements CarService {
     private final UserRepository userRepository;
     private final CarRepository carRepository;
     private final ImageStorageService imageStorageService;
+
 
     @Override
     public Car addNewCar(
@@ -46,7 +47,6 @@ public class CarServiceImpl implements CarService {
 
         if (images != null && images.length > 0) {
             List<String> imageUrls;
-
             try {
                 imageUrls = imageStorageService.storeImages(images);
             } catch (Exception ex) {
@@ -61,6 +61,39 @@ public class CarServiceImpl implements CarService {
             }
         }
 
+        return carRepository.save(car);
+    }
+
+  
+
+    @Override
+    public List<Car> getPendingCars() {
+        return carRepository.findByStatus(Status.PENDING_APPROVAL);
+    }
+
+    @Override
+    public Car approveCar(Long carId) {
+        Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new ApiException("Car not found"));
+
+        if (car.getStatus() != Status.PENDING_APPROVAL) {
+            throw new ApiException("Car is not pending approval");
+        }
+
+        car.setStatus(Status.AVAILABLE);
+        return carRepository.save(car);
+    }
+
+    @Override
+    public Car rejectCar(Long carId) {
+        Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new ApiException("Car not found"));
+
+        if (car.getStatus() != Status.PENDING_APPROVAL) {
+            throw new ApiException("Car is not pending approval");
+        }
+
+        car.setStatus(Status.CANCELLED);
         return carRepository.save(car);
     }
 }
