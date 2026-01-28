@@ -1,8 +1,34 @@
-import React from "react";
+// import React, { useState, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAllCars } from "../carServices/CarFetch";
+import CarCard from "../CarPages/CarCard";
+
 
 function Home() {
+
+    const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  
+  const fetchCars = async () => {
+    try {
+      const data = await getAllCars();
+      console.log(data);
+      setCars(data);
+    } catch (err) {
+      setError("Failed to load cars");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+  fetchCars();
+}, []);
 
   return (
     <div>
@@ -40,12 +66,35 @@ function Home() {
             >
               Explore Auctions
             </button>
-            <button className="btn btn-outline-secondary btn-lg">
+            <button className="btn btn-outline-secondary btn-lg" onClick={()=>navigate("/addcar")}>
               Start Selling
             </button>
           </div>
         </div>
       </section>
+    {/* ========================Car SEction ========================== */}
+   {/* ================= CARS SECTION ================= */}
+      <section className="bg-light py-5">
+        <div className="container">
+          <h3 className="text-center fw-bold mb-4">🚗 Cars for Auction</h3>
+
+          {loading && <p className="text-center">Loading cars...</p>}
+          {error && <p className="text-center text-danger">{error}</p>}
+
+          <div className="row">
+            {!loading && cars.length === 0 ? (
+              <p className="text-center text-muted">No cars available right now</p>
+            ) : (
+              cars.map((car) => (
+                <div className="col-md-4 mb-4" key={car.id}>
+                  <CarCard car={car} />
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+    
 
       {/* ================= FEATURES ================= */}
       <section className="container py-5">

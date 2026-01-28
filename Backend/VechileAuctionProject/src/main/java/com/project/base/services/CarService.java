@@ -11,4 +11,5 @@ import com.project.base.dto.CarDto;
 
 public interface CarService {
 	public ApiResponse addNewCar(CarDto carDto,MultipartFile[] images) throws IOException ;
-	}
+	
+}

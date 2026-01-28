@@ -56,7 +56,5 @@ public class CarDto {
     private Integer manufacture_year;
     private String color;
     private Integer engine_cc;
-    
-
     private String description;
 }

@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.base.services.impl.ImageStorageService;
 //import com.sun.tools.javac.util.StringUtils;
 import org.springframework.util.StringUtils;
-
+@Transactional
 @Service
 public class ImageStorageServiceImpl implements ImageStorageService {
 
