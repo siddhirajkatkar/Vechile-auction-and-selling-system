@@ -1,13 +1,15 @@
-import axios from "../api/axiosConfig";
+import axios from "axios";
+
+const BASE_URL = "http://localhost:8080/admin/cars";
 
 export const getPendingVehicles = () => {
-  return axios.get("/admin/cars/pending");
+  return axios.get(`${BASE_URL}/pending`);
 };
 
 export const approveVehicle = (id) => {
-  return axios.put(`/admin/cars/${id}/approve`);
+  return axios.put(`${BASE_URL}/${id}/approve`);
 };
 
 export const rejectVehicle = (id) => {
-  return axios.put(`/admin/cars/${id}/reject`);
+  return axios.put(`${BASE_URL}/${id}/reject`);
 };

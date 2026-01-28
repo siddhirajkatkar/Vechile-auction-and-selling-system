@@ -1,21 +1,28 @@
 package com.project.base.security;
 
-import java.io.IOException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -24,25 +31,60 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
-        Authentication authentication = null;
+        System.out.println("🔐 JwtFilter HIT → "
+                + request.getMethod() + " " + request.getRequestURI());
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // remove "Bearer "
-            authentication = jwtUtil.validateToken(token);
+        final String authHeader = request.getHeader("Authorization");
+
+        // 1. Check header
+        if (authHeader == null || authHeader.isBlank()) {
+            System.out.println("⛔ No Authorization header found");
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        if (authentication != null &&
-            SecurityContextHolder.getContext().getAuthentication() == null) {
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (!authHeader.startsWith("Bearer ")) {
+            System.out.println("⛔ Authorization header does not start with Bearer");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 2. Extract & clean token
+        String jwt = authHeader.substring(7).replaceAll("\\s", "");
+        System.out.println("✅ JWT extracted");
+
+        try {
+            String userEmail = jwtUtil.extractUsername(jwt);
+            System.out.println("📧 Username extracted from token = " + userEmail);
+
+            if (userEmail != null
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(userEmail);
+
+                System.out.println("👤 User loaded from DB = " + userDetails.getUsername());
+                System.out.println("🛡️ Authorities = " + userDetails.getAuthorities());
+
+                if (jwtUtil.isTokenValid(jwt)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    System.out.println("✅ Authentication set in SecurityContext");
+                } else {
+                    System.out.println("❌ JWT is NOT valid");
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ JWT Parse / Auth Error: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
-        return path.startsWith("/auth/");
     }
 }

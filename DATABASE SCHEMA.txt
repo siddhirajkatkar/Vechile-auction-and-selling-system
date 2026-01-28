@@ -1,14 +1,24 @@
+-- ================================
+-- RESET SAFETY SETTINGS
+-- ================================
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE;
 SET SQL_MODE='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
-CREATE SCHEMA IF NOT EXISTS car_auction_mart
+-- ================================
+-- DROP SCHEMA
+-- ================================
+DROP SCHEMA IF EXISTS car_auction_mart;
+CREATE SCHEMA car_auction_mart
 DEFAULT CHARACTER SET utf8mb4
 COLLATE utf8mb4_0900_ai_ci;
 
 USE car_auction_mart;
 
+-- ================================
+-- USERS
+-- ================================
 CREATE TABLE users (
   user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(100),
@@ -22,6 +32,9 @@ CREATE TABLE users (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+-- ================================
+-- ROLES
+-- ================================
 CREATE TABLE roles (
   role_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   role_name VARCHAR(255) NOT NULL UNIQUE
@@ -35,6 +48,25 @@ CREATE TABLE user_roles (
   FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- ================================
+-- SUBSCRIPTION (NEW)
+-- ================================
+CREATE TABLE subscription_plans (
+  plan_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  plan_name ENUM('BASIC','PREMIUM') UNIQUE NOT NULL,
+  max_auctions_allowed INT NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE user_subscriptions (
+  user_id BIGINT PRIMARY KEY,
+  plan_id BIGINT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(user_id),
+  FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)
+) ENGINE=InnoDB;
+
+-- ================================
+-- CARS
+-- ================================
 CREATE TABLE cars (
   car_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   seller_id BIGINT NOT NULL,
@@ -50,19 +82,18 @@ CREATE TABLE cars (
   description TEXT,
   sale_type ENUM('AUCTION','DIRECT') NOT NULL,
   status ENUM(
-    'DRAFT',
-    'PENDING_APPROVAL',
-    'AVAILABLE',
-    'UNDER_AUCTION',
-    'AUCTION_COMPLETED',
-    'SOLD',
-    'CANCELLED'
+    'DRAFT','PENDING_APPROVAL','AVAILABLE',
+    'UNDER_AUCTION','AUCTION_COMPLETED',
+    'SOLD','CANCELLED'
   ) DEFAULT 'DRAFT',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (seller_id) REFERENCES users(user_id)
 ) ENGINE=InnoDB;
 
+-- ================================
+-- CAR IMAGES
+-- ================================
 CREATE TABLE car_images (
   image_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   car_id BIGINT NOT NULL,
@@ -70,6 +101,9 @@ CREATE TABLE car_images (
   FOREIGN KEY (car_id) REFERENCES cars(car_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- ================================
+-- AUCTIONS
+-- ================================
 CREATE TABLE auctions (
   auction_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   car_id BIGINT NOT NULL UNIQUE,
@@ -83,6 +117,9 @@ CREATE TABLE auctions (
   FOREIGN KEY (winner_id) REFERENCES users(user_id)
 ) ENGINE=InnoDB;
 
+-- ================================
+-- BIDS
+-- ================================
 CREATE TABLE bids (
   bid_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   auction_id BIGINT NOT NULL,
@@ -94,6 +131,9 @@ CREATE TABLE bids (
   INDEX idx_auction_bid (auction_id, bid_amount)
 ) ENGINE=InnoDB;
 
+-- ================================
+-- ORDERS
+-- ================================
 CREATE TABLE orders (
   order_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   buyer_id BIGINT NOT NULL,
@@ -108,6 +148,9 @@ CREATE TABLE orders (
   FOREIGN KEY (auction_id) REFERENCES auctions(auction_id)
 ) ENGINE=InnoDB;
 
+-- ================================
+-- PAYMENTS
+-- ================================
 CREATE TABLE payments (
   payment_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   order_id BIGINT NOT NULL,
@@ -119,6 +162,9 @@ CREATE TABLE payments (
   FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- ================================
+-- CART
+-- ================================
 CREATE TABLE cart (
   cart_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   user_id BIGINT NOT NULL,
@@ -129,6 +175,9 @@ CREATE TABLE cart (
   FOREIGN KEY (car_id) REFERENCES cars(car_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- ================================
+-- WISHLIST
+-- ================================
 CREATE TABLE wishlist (
   wishlist_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   user_id BIGINT NOT NULL,
@@ -138,6 +187,9 @@ CREATE TABLE wishlist (
   FOREIGN KEY (car_id) REFERENCES cars(car_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- ================================
+-- REVIEWS
+-- ================================
 CREATE TABLE reviews (
   review_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   car_id BIGINT NOT NULL,
@@ -150,6 +202,9 @@ CREATE TABLE reviews (
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 ) ENGINE=InnoDB;
 
+-- ================================
+-- RESTORE SETTINGS
+-- ================================
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

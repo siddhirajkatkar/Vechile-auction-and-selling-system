@@ -1,75 +1,89 @@
 package com.project.base.security;
 
-import java.security.Key;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.stereotype.Component;
-
-
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.util.Date;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
-	@Value(value="${jwt.token.expiration.millis}")
-	public long jwtExpiration;
-	@Value(value="${jwt.token.secret}")
-	public String jwtSecret;
-	private Key jwtKey;
-	
-	@PostConstruct
-	public void init() {
-		jwtKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-	}
-	
-	public String createToken(Authentication auth) {
-		User user = (User)auth.getPrincipal();
-		String subject = "" + user.getUsername(); //user.getUsername();	// user email
-		String roles = user.getAuthorities().stream()	// user role e.g. ROLE_USER or ROLE_ADMIN
-				.map(authority -> authority.getAuthority())
-				.collect(Collectors.joining(","));
-		String token = Jwts.builder()
-			.setSubject(subject)
-			.setIssuedAt(new Date())
-			.setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-			.claim("role", roles)
-			.signWith(jwtKey , SignatureAlgorithm.HS256)
-			.compact();
-		return token;
-	}
-	
-	public Authentication validateToken(String token) {
-	    try {
-	        Claims claims = Jwts.parserBuilder()
-	                .setSigningKey(jwtKey)
-	                .build()
-	                .parseClaimsJws(token)
-	                .getBody();
 
-	        String username = claims.getSubject();
-	        String roles = (String) claims.get("role");
+    @Value("${jwt.token.expiration.millis}")
+    private long jwtExpiration;
 
-	        List<GrantedAuthority> authorities =
-	                AuthorityUtils.commaSeparatedStringToAuthorityList(roles);
+    @Value("${jwt.token.secret}")
+    private String jwtSecret;
 
-	        return new UsernamePasswordAuthenticationToken(username, null, authorities);
+    private Key jwtKey;
 
-	    } catch (Exception e) {
-	        return null;
-	    }
-	}
+    // 🔑 Initialize signing key using Base64 Decoder
+    @PostConstruct
+    public void init() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        this.jwtKey = Keys.hmacShaKeyFor(keyBytes);
+    }
 
+    // 🔐 Generate JWT Token
+    public String generateToken(Authentication authentication) {
+        MyUserDetails user = (MyUserDetails) authentication.getPrincipal();
+
+        String roles = user.getAuthorities().stream()
+                .map(auth -> auth.getAuthority()) 
+                .collect(Collectors.joining(","));
+
+        return Jwts.builder()
+                .setSubject(user.getUsername())
+                .claim("roles", roles)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(jwtKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    // 🔍 Extract username (email) from token
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    // ✅ Validate token
+    public boolean isTokenValid(String token) {
+        try {
+            extractAllClaims(token);
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    // 🔓 Parse claims using the same jwtKey
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(jwtKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
 }

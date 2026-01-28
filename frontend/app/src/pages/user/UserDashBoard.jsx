@@ -11,7 +11,10 @@ const UserDashboard = () => {
 
         <button
           className="btn btn-light"
-          onClick={() => navigate("/")}
+          onClick={() => {
+            localStorage.removeItem("token");
+            navigate("/");
+          }}
         >
           Logout
         </button>
@@ -32,7 +35,10 @@ const UserDashboard = () => {
                 <p className="text-muted">
                   Browse and bid on available vehicles.
                 </p>
-                <button className="btn btn-primary btn-sm">
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => navigate("/user/auctions")}
+                >
                   Go
                 </button>
               </div>
@@ -46,7 +52,10 @@ const UserDashboard = () => {
                 <p className="text-muted">
                   Check vehicles you have bid on.
                 </p>
-                <button className="btn btn-primary btn-sm">
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => navigate("/user/bids")}
+                >
                   Go
                 </button>
               </div>
@@ -60,7 +69,10 @@ const UserDashboard = () => {
                 <p className="text-muted">
                   Add your vehicle for auction.
                 </p>
-                <button className="btn btn-primary btn-sm">
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => navigate("/user/sell-car")}
+                >
                   Go
                 </button>
               </div>

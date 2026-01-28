@@ -1,54 +1,52 @@
 package com.project.base.dto;
 
-import com.project.base.pojo.FuelType;
-import com.project.base.pojo.SaleType;
-import com.project.base.pojo.Transmission;
+import com.project.base.pojo.*;
+import lombok.*;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
+@Getter 
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class CarDto {
+    // Matches: registration_no (Unique)
+    private String registrationNo;
 
-    @NotBlank(message = "Registration number is required")
-    private String registration_no;
-
-    @NotBlank(message = "Brand is required")
+    // Matches: brand
     private String brand;
 
-    @NotBlank(message = "Model is required")
+    // Matches: manufacturer (Database marked this as NO NULL)
+    private String manufacturer;
+
+    // Matches: model
     private String model;
 
-    @NotNull(message = "Fuel type must be provided")
-    private FuelType fuel_type;
+    // Matches: manufacture_year
+    private int manufactureYear;
 
-    @NotNull(message = "Transmission must be provided")
+    // Matches: fuel_type (Enum)
+    private FuelType fuelType;
+
+    // Matches: transmission (Enum)
     private Transmission transmission;
 
-    @PositiveOrZero(message = "Price must be 0 or greater")
-    private double price;
+    // Matches: km_driven (Database marked this as NO NULL)
+    private Integer kmDriven;
 
-    @NotNull(message = "Sale type must be provided")
-    private SaleType sale_type;
-
-    @PositiveOrZero(message = "Mileage must be 0 or greater")
+    // Matches: mileage (Optional in DB)
     private Integer mileage;
 
-    @PositiveOrZero(message = "Manufacture year must be valid")
-    private Integer manufacture_year;
-
+    // Matches: color
     private String color;
 
-    @PositiveOrZero(message = "Engine CC must be 0 or greater")
-    private Integer engine_cc;
+    // Matches: engine_cc
+    private Integer engineCc;
 
+    // Matches: price
+    private double price;
+
+    // Matches: description
     private String description;
+
+    // Matches: sale_type (Enum)
+    private SaleType saleType;
 }

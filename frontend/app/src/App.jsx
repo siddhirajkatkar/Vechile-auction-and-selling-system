@@ -13,6 +13,7 @@ import AdminDashboard from "./pages/admin/AdminDashBoard";
 import ManageUsers from "./pages/admin/ManageUsers";
 import ManageVehicles from "./pages/admin/ManageVechiles";
 import ViewAuctions from "./pages/admin/ViewAuctions";
+import SellCar from "./components/SellCar";
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
       <Route path="/admin/users" element={<ManageUsers />} />
       <Route path="/admin/vehicles" element={<ManageVehicles />} />
       <Route path="/admin/auctions" element={<ViewAuctions />} />
+              <Route path="/user/sell-car" element={<SellCar />} />
+
     </Routes>
   );
 }

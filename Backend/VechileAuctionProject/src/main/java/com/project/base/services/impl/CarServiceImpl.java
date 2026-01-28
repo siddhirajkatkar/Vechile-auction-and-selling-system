@@ -1,99 +1,135 @@
 package com.project.base.services.impl;
 
-import java.util.List;
+import com.project.base.dto.CarDto;
+import com.project.base.dto.CarResponseDTO;
+import com.project.base.pojo.Car;
+import com.project.base.pojo.Status;
+import com.project.base.repository.CarRepository;
+import com.project.base.repository.UserRepository;
+import com.project.base.services.CarService;
 
-import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.base.dto.CarDto;
-import com.project.base.exception.ApiException;
-import com.project.base.pojo.Car;
-import com.project.base.pojo.CarImage;
-import com.project.base.pojo.Status;
-import com.project.base.pojo.User;
-import com.project.base.repository.CarRepository;
-import com.project.base.repository.UserRepository;
-import com.project.base.services.CarService;
-import com.project.base.services.ImageStorageService;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
 
-    private final ModelMapper modelMapper;
-    private final UserRepository userRepository;
-    private final CarRepository carRepository;
-    private final ImageStorageService imageStorageService;
+    @Autowired
+    private CarRepository carRepo;
 
+    @Autowired
+    private UserRepository userRepo;
 
     @Override
-    public Car addNewCar(
-            CarDto carDto,
-            MultipartFile[] images,
-            Long sellerId
-    ) {
+    public Car addNewCar(CarDto carDto, MultipartFile[] images, Long sellerId) {
 
-        User seller = userRepository.findById(sellerId)
-                .orElseThrow(() -> new ApiException("Seller not found"));
+        Car car = new Car();
 
-        Car car = modelMapper.map(carDto, Car.class);
-        car.setSeller(seller);
+        car.setRegistrationNo(carDto.getRegistrationNo());
+        car.setBrand(carDto.getBrand());
+        car.setModel(carDto.getModel());
+        car.setManufactureYear(carDto.getManufactureYear());
+
+        car.setFuelType(carDto.getFuelType());
+        car.setTransmission(carDto.getTransmission());
+        car.setSaleType(carDto.getSaleType());
+
+        car.setMileage(carDto.getMileage());
+        car.setEngineCc(carDto.getEngineCc());
+        car.setPrice(carDto.getPrice());
+
+        car.setColor(carDto.getColor());
+        car.setDescription(carDto.getDescription());
         car.setStatus(Status.PENDING_APPROVAL);
 
-        if (images != null && images.length > 0) {
-            List<String> imageUrls;
-            try {
-                imageUrls = imageStorageService.storeImages(images);
-            } catch (Exception ex) {
-                throw new ApiException("Failed to store car images");
-            }
+        car.setSeller(
+            userRepo.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller not found"))
+        );
 
-            for (String url : imageUrls) {
-                CarImage image = new CarImage();
-                image.setImageUrl(url);
-                image.setCar(car);
-                car.getImages().add(image);
-            }
-        }
-
-        return carRepository.save(car);
+        return carRepo.save(car);
     }
-
-  
 
     @Override
     public List<Car> getPendingCars() {
-        return carRepository.findByStatus(Status.PENDING_APPROVAL);
+        return carRepo.findByStatus(Status.PENDING_APPROVAL);
     }
 
     @Override
     public Car approveCar(Long carId) {
-        Car car = carRepository.findById(carId)
-                .orElseThrow(() -> new ApiException("Car not found"));
-
-        if (car.getStatus() != Status.PENDING_APPROVAL) {
-            throw new ApiException("Car is not pending approval");
-        }
-
+        Car car = carRepo.findById(carId)
+                .orElseThrow(() -> new RuntimeException("Car not found"));
         car.setStatus(Status.AVAILABLE);
-        return carRepository.save(car);
+        return carRepo.save(car);
     }
 
     @Override
     public Car rejectCar(Long carId) {
-        Car car = carRepository.findById(carId)
-                .orElseThrow(() -> new ApiException("Car not found"));
-
-        if (car.getStatus() != Status.PENDING_APPROVAL) {
-            throw new ApiException("Car is not pending approval");
-        }
-
+        Car car = carRepo.findById(carId)
+                .orElseThrow(() -> new RuntimeException("Car not found"));
         car.setStatus(Status.CANCELLED);
-        return carRepository.save(car);
+        return carRepo.save(car);
+    }
+
+    @Override
+    public List<CarResponseDTO> getAllAvailableCars() {
+        List<Car> cars = carRepo.findByStatus(Status.AVAILABLE);
+
+        return cars.stream().map(car -> {
+            CarResponseDTO dto = new CarResponseDTO();
+            dto.setId(car.getId());
+            dto.setRegistrationNo(car.getRegistrationNo());
+            dto.setBrand(car.getBrand());
+            dto.setModel(car.getModel());
+            dto.setManufactureYear(car.getManufactureYear());
+            dto.setPrice(car.getPrice());
+            dto.setStatus(car.getStatus().name());
+
+            if (car.getSeller() != null) {
+                dto.setSellerName(
+                    car.getSeller().getFirstName() + " " +
+                    car.getSeller().getLastName()
+                );
+            }
+
+            dto.setImageUrls(
+                car.getImages()
+                    .stream()
+                    .map(img -> img.getImageUrl())
+                    .collect(Collectors.toList())
+            );
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CarResponseDTO> getAllCars() {
+
+        return carRepo.findAll().stream().map(car -> {
+            CarResponseDTO dto = new CarResponseDTO();
+            dto.setId(car.getId());
+            dto.setBrand(car.getBrand());
+            dto.setModel(car.getModel());
+            dto.setPrice(car.getPrice());
+            dto.setStatus(car.getStatus().name());
+            dto.setSellerName(
+                car.getSeller().getFirstName() + " " +
+                car.getSeller().getLastName()
+            );
+            dto.setImageUrls(
+                car.getImages()
+                    .stream()
+                    .map(i -> i.getImageUrl())
+                    .collect(Collectors.toList())
+            );
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

@@ -3,25 +3,12 @@ package com.project.base.pojo;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 @Entity
 @Table(name = "cars")
@@ -50,12 +37,12 @@ public class Car extends BaseEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "fuel_type", nullable = false)
+    @Column(name = "fuel_type", nullable = false, length = 20) // ✅ Added length
     private FuelType fuelType;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20) // ✅ Added length
     private Transmission transmission;
 
     @PositiveOrZero
@@ -75,21 +62,36 @@ public class Car extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+ // In Car.java
+    @JsonManagedReference // ✅ Tells Jackson to fetch the images
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER) 
     private List<CarImage> images = new ArrayList<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "sale_type", nullable = false)
+    @Column(name = "sale_type", nullable = false, length = 20) // ✅ Added length
     private SaleType saleType;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 30) // ✅ Fix: Length 30 accommodates "PENDING_APPROVAL"
     private Status status;
+
+ // In Car.java
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "roles"}) // ✅ Add this
     private User seller;
+    
+ // Inside Car.java
+
+    @NotBlank
+    @Column(nullable = false) // Matches the 'NO' in your DB Null column
+    private String manufacturer; // ✅ Add this field
+
+    @PositiveOrZero
+    @Column(name = "km_driven", nullable = false) // ✅ Ensure this matches the DB too
+    private Integer kmDriven;
 }
