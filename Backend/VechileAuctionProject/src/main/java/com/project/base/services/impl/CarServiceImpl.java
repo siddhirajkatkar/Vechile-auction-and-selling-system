@@ -31,10 +31,12 @@ public class CarServiceImpl implements CarService {
         Car car = new Car();
         car.setRegistrationNo(carDto.getRegistrationNo());
         car.setBrand(carDto.getBrand());
+        car.setManufacturer(carDto.getManufacturer());  // ✅ FIX
         car.setModel(carDto.getModel());
         car.setManufactureYear(carDto.getManufactureYear());
         car.setFuelType(carDto.getFuelType());
         car.setTransmission(carDto.getTransmission());
+        car.setKmDriven(carDto.getKmDriven());          // ✅ FIX
         car.setSaleType(carDto.getSaleType());
         car.setMileage(carDto.getMileage());
         car.setEngineCc(carDto.getEngineCc());
