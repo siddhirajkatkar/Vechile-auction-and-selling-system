@@ -62,6 +62,7 @@ public class UserCarServiceImpl implements UserCarService{
 	            dto.setStatus(car.getStatus());
 
 	            // Images
+
 	            dto.setImages(car.getImages());
 
 	            return dto;

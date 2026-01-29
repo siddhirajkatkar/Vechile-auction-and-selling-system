@@ -184,6 +184,10 @@ public class CarServiceImpl implements CarService {
         dto.setSaleType(car.getSaleType());
         dto.setStatus(car.getStatus());
 
+        dto.setImages(car.getImages());
+        
         return dto;
-    }
+
+
+}
 }

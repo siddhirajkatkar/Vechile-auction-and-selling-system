@@ -41,6 +41,5 @@ public class CarResponseDTO {
 	    private SaleType saleType;
 
 	    // Add this for frontend to display images
-	    private List<CarImage> images;
-	}
+	    private List<CarImage> images;	}
 

@@ -139,6 +139,25 @@ const UserDashboard = () => {
             </div>
           </div>
 
+          {/* CARS FOR SALE */}
+          <div className="col-md-4 mb-3">
+            <div className="card text-center h-100 "> 
+              {/* border-0 shadow-sm */}
+              <div className="card-body">
+                <h5>Cars For Sale</h5>
+                <p className="text-muted">
+                  Explore vehicles available for direct purchase.
+                </p>
+                <button
+                  className="btn btn-warning btn-sm"
+                  onClick={() => navigate("/user/car-for-sell")}
+                >
+                  Browse Cars
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

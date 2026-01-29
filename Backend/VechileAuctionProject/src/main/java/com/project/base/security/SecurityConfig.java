@@ -54,7 +54,9 @@ public class SecurityConfig {
 
             // Authorization rules
             .authorizeHttpRequests(auth -> auth
-            	.requestMatchers("/uploads/**").permitAll()  
+            	.requestMatchers("/uploads/**").permitAll() 
+            	.requestMatchers("/api/cars/all").permitAll()
+
                 .requestMatchers(
                     "/api/auth/**",
                     "/v3/api-docs/**",
