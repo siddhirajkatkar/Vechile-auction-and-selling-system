@@ -1,5 +1,5 @@
-import axios from "../api/axiosConfig";
+import api from "./axios";
 
-export const getOngoingAuctions = () => {
-  return axios.get("/admin/auctions/ongoing");
+export const getUserAuctions = () => {
+  return api.get("/api/auctions");
 };

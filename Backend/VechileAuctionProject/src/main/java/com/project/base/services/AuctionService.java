@@ -1,13 +1,10 @@
-//package com.project.base.services;
-//
-//public interface AuctionService {
-//    // Creation
-//    void createAuction(Long carId, LocalDateTime endTime, double minBid);
-//    
-//    // Bidding
-//    void placeBid(Long auctionId, Long userId, double bidAmount);
-//    
-//    // Logic
-//    List<AuctionResponseDTO> getActiveAuctions();
-//    void finalizeAuction(Long auctionId); // Sets status to AUCTION_COMPLETED
-//}
+package com.project.base.services;
+
+import com.project.base.pojo.Auction;
+
+import java.util.List;
+
+public interface AuctionService {
+
+    List<Auction> viewActiveAuctions(Long userId);
+}

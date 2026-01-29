@@ -13,7 +13,6 @@ const MySubscription = () => {
   const fetchMySubscription = async () => {
     try {
       const response = await axios.get("/api/subscriptions/me");
-      // example API: GET /user/subscription
       setSubscription(response.data);
     } catch (err) {
       setError("Failed to load subscription details");
@@ -39,11 +38,17 @@ const MySubscription = () => {
       <h1>My Subscription</h1>
 
       <div style={{ border: "1px solid #ccc", padding: "15px", width: "400px" }}>
-        <p><b>Plan:</b> {subscription.planName}</p>
+        <p><b>Plan:</b> {subscription.plan?.planName}</p>
         <p><b>Status:</b> {subscription.status}</p>
-        <p><b>Start Date:</b> {subscription.startDate}</p>
-        <p><b>End Date:</b> {subscription.endDate}</p>
-        <p><b>Bids Left:</b> {subscription.remainingBids}</p>
+        <p>
+          <b>Start Date:</b>{" "}
+          {new Date(subscription.startDate).toLocaleString()}
+        </p>
+        <p>
+          <b>End Date:</b>{" "}
+          {new Date(subscription.endDate).toLocaleString()}
+        </p>
+        <p><b>Bids Left:</b> {subscription.bidsRemaining}</p>
       </div>
     </div>
   );

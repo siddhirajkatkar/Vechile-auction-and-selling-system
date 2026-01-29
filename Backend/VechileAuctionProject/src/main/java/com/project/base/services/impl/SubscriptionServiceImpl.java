@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -34,12 +35,23 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         SubscriptionPlan plan = planRepo.findByPlanName(planName)
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
 
+        // 🔥 STEP 1: Expire ALL active subscriptions of user
+        List<UserSubscription> activeSubs =
+                userSubRepo.findAllByUserAndStatus(user, SubscriptionStatus.ACTIVE);
+
+        for (UserSubscription sub : activeSubs) {
+            sub.setStatus(SubscriptionStatus.EXPIRED);
+        }
+        userSubRepo.saveAll(activeSubs);
+
+        // 🔥 STEP 2: Create new ACTIVE subscription
         UserSubscription subscription = new UserSubscription();
         subscription.setUser(user);
         subscription.setPlan(plan);
         subscription.setBidsRemaining(plan.getTotalBids());
         subscription.setStartDate(LocalDateTime.now());
-        subscription.setEndDate(LocalDateTime.now().plusMonths(1));
+        subscription.setEndDate(LocalDateTime.now().plusMonths(1)); // or plan validity
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
 
         return userSubRepo.save(subscription);
     }
@@ -50,7 +62,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return userSubRepo.findByUser(user)
+        return userSubRepo.findAllByUserAndStatus(user, SubscriptionStatus.ACTIVE)
+                .stream()
+                .findFirst()
                 .orElseThrow(() -> new RuntimeException("No active subscription"));
     }
 }
