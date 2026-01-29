@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const AddCar = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [car, setCar] = useState({
     registrationNo: "",
@@ -31,144 +32,171 @@ const AddCar = () => {
 
   const submitCar = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      // 🔥 Convert data to DTO format expected by backend
       const carData = {
-        registrationNo: car.registrationNo,
-        brand: car.brand,
-        manufacturer: car.manufacturer,
-        model: car.model,
+        ...car,
         manufactureYear: parseInt(car.manufactureYear),
-        fuelType: car.fuelType,
-        transmission: car.transmission,
         kmDriven: parseInt(car.kmDriven),
-        mileage: null,
-        color: car.color,
-        engineCc: null,
         price: parseFloat(car.price),
-        description: "",
-        saleType: car.saleType
+        mileage: null,
+        engineCc: null,
+        description: ""
       };
 
       const formData = new FormData();
       formData.append("carData", JSON.stringify(carData));
 
-      // Add images if selected
       for (let i = 0; i < images.length; i++) {
         formData.append("images", images[i]);
       }
 
       await axios.post("/api/cars/add", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       alert("🚗 Car added successfully!");
       navigate("/user/my-cars");
-
     } catch (err) {
-      console.error("ERROR:", err.response?.data || err.message);
       alert("❌ Failed to add car");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mt-5">
-      <div className="card shadow-lg border-0 rounded-4">
-        <div className="card-body p-4">
-          <h2 className="text-center mb-4 text-primary fw-bold">🚗 Add New Car</h2>
+    <div className="min-vh-100 pb-5" style={{ backgroundColor: "#f8f9fa" }}>
+      {/* Bootstrap Icons */}
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net" />
 
-          <form onSubmit={submitCar}>
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Registration No</label>
-                <input type="text" name="registrationNo" className="form-control" onChange={handleChange} required />
-              </div>
-
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Brand</label>
-                <input type="text" name="brand" className="form-control" onChange={handleChange} required />
-              </div>
-            </div>
-
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Manufacturer</label>
-                <input type="text" name="manufacturer" className="form-control" onChange={handleChange} required />
-              </div>
-
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Model</label>
-                <input type="text" name="model" className="form-control" onChange={handleChange} required />
-              </div>
-            </div>
-
-            <div className="row">
-              <div className="col-md-4 mb-3">
-                <label className="form-label">Manufacture Year</label>
-                <input type="number" name="manufactureYear" className="form-control" onChange={handleChange} required />
-              </div>
-
-              <div className="col-md-4 mb-3">
-                <label className="form-label">Fuel Type</label>
-                <select name="fuelType" className="form-select" onChange={handleChange} required>
-                  <option value="">Select</option>
-                  <option value="PETROL">Petrol</option>
-                  <option value="DIESEL">Diesel</option>
-                  <option value="ELECTRIC">Electric</option>
-                </select>
-              </div>
-
-              <div className="col-md-4 mb-3">
-                <label className="form-label">Transmission</label>
-                <select name="transmission" className="form-select" onChange={handleChange} required>
-                  <option value="">Select</option>
-                  <option value="MANUAL">Manual</option>
-                  <option value="AUTOMATIC">Automatic</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="row">
-              <div className="col-md-4 mb-3">
-                <label className="form-label">KM Driven</label>
-                <input type="number" name="kmDriven" className="form-control" onChange={handleChange} required />
-              </div>
-
-              <div className="col-md-4 mb-3">
-                <label className="form-label">Color</label>
-                <input type="text" name="color" className="form-control" onChange={handleChange} />
-              </div>
-
-              <div className="col-md-4 mb-3">
-                <label className="form-label">Price (₹)</label>
-                <input type="number" name="price" className="form-control" onChange={handleChange} required />
-              </div>
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Sale Type</label>
-              <select name="saleType" className="form-select" onChange={handleChange}>
-                <option value="DIRECT">Direct Sale</option>
-                <option value="AUCTION">Auction</option>
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label className="form-label">Car Images</label>
-              <input type="file" className="form-control" multiple onChange={handleImageChange} />
-            </div>
-
-            <div className="d-grid">
-              <button type="submit" className="btn btn-primary btn-lg rounded-3">
-                ➕ Add Car
-              </button>
-            </div>
-          </form>
+      {/* HEADER SECTION */}
+      <div className="bg-white border-bottom py-4 mb-5 shadow-sm">
+        <div className="container d-flex justify-content-between align-items-center">
+          <div>
+            <button className="btn btn-link text-decoration-none text-muted p-0 mb-1" onClick={() => navigate("/user/dashboard")}>
+              <i className="bi bi-arrow-left me-1"></i> Dashboard
+            </button>
+            <h3 className="fw-bold mb-0 text-dark">List Your <span className="text-primary">Vehicle</span></h3>
+          </div>
+          <div className="d-none d-md-block text-muted small fw-bold">STEP 1 OF 1: VEHICLE DETAILS</div>
         </div>
       </div>
+
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-lg-10">
+            <div className="card border-0 shadow-lg p-3 p-md-4" style={{ borderRadius: "20px" }}>
+              <form onSubmit={submitCar}>
+                
+                {/* SECTION 1: BASIC INFO */}
+                <div className="mb-5">
+                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Vehicle Identification</h5>
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <label className="form-label small fw-bold">Registration Number</label>
+                      <input type="text" name="registrationNo" placeholder="e.g. MH12AB1234" className="form-control custom-input" onChange={handleChange} required />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label small fw-bold">Brand Name</label>
+                      <input type="text" name="brand" placeholder="e.g. Toyota" className="form-control custom-input" onChange={handleChange} required />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label small fw-bold">Manufacturer</label>
+                      <input type="text" name="manufacturer" placeholder="e.g. Toyota Kirloskar" className="form-control custom-input" onChange={handleChange} required />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label small fw-bold">Model</label>
+                      <input type="text" name="model" placeholder="e.g. Fortuner" className="form-control custom-input" onChange={handleChange} required />
+                    </div>
+                  </div>
+                </div>
+
+                {/* SECTION 2: SPECIFICATIONS */}
+                <div className="mb-5">
+                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Technical Specifications</h5>
+                  <div className="row g-3">
+                    <div className="col-md-4">
+                      <label className="form-label small fw-bold">Manufacture Year</label>
+                      <input type="number" name="manufactureYear" className="form-control custom-input" onChange={handleChange} required />
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label small fw-bold">Fuel Type</label>
+                      <select name="fuelType" className="form-select custom-input" onChange={handleChange} required>
+                        <option value="">Select Fuel</option>
+                        <option value="PETROL">Petrol</option>
+                        <option value="DIESEL">Diesel</option>
+                        <option value="ELECTRIC">Electric</option>
+                        <option value="HYBRID">Hybrid</option>
+                      </select>
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label small fw-bold">Transmission</label>
+                      <select name="transmission" className="form-select custom-input" onChange={handleChange} required>
+                        <option value="">Select Gearbox</option>
+                        <option value="MANUAL">Manual</option>
+                        <option value="AUTOMATIC">Automatic</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SECTION 3: CONDITION & PRICING */}
+                <div className="mb-5">
+                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Condition & Pricing</h5>
+                  <div className="row g-3">
+                    <div className="col-md-4">
+                      <label className="form-label small fw-bold">Distance Driven (KM)</label>
+                      <input type="number" name="kmDriven" className="form-control custom-input" onChange={handleChange} required />
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label small fw-bold">Color</label>
+                      <input type="text" name="color" className="form-control custom-input" onChange={handleChange} />
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label small fw-bold">Expected Price (₹)</label>
+                      <input type="number" name="price" className="form-control custom-input fw-bold text-primary" onChange={handleChange} required />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label small fw-bold">Listing Type</label>
+                      <select name="saleType" className="form-select custom-input" onChange={handleChange}>
+                        <option value="DIRECT">Direct Marketplace Sale</option>
+                        <option value="AUCTION">Put for Auction</option>
+                      </select>
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label small fw-bold">Upload Images</label>
+                      <input type="file" className="form-control custom-input" multiple onChange={handleImageChange} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="d-grid mt-4">
+                  <button type="submit" disabled={loading} className="btn btn-primary btn-lg rounded-pill shadow fw-bold py-3">
+                    {loading ? "Processing..." : <><i className="bi bi-cloud-arrow-up me-2"></i> Publish Vehicle</>}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        .custom-input {
+          padding: 0.75rem 1rem;
+          border-radius: 12px;
+          border: 1px solid #e0e0e0;
+          background-color: #fcfcfc;
+          transition: all 0.2s;
+        }
+        .custom-input:focus {
+          border-color: #0d6efd;
+          background-color: #fff;
+          box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+        }
+        .form-label { color: #555; }
+      `}</style>
     </div>
   );
 };

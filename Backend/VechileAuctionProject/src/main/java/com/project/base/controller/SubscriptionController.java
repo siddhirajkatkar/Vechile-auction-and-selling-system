@@ -41,7 +41,7 @@ public class SubscriptionController {
     // BUYER SUBSCRIBES TO A PLAN
     // ===============================
     @PostMapping("/buy/{planName}")
-    @PreAuthorize("hasAuthority('ROLE_BUYER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_BUYER','ROLE_SELLER')")
     public ResponseEntity<UserSubscription> buyPlan(
             @PathVariable PlanName planName) {
 
