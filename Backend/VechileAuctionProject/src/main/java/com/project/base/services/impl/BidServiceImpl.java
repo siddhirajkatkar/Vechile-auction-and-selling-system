@@ -1,6 +1,7 @@
 package com.project.base.services.impl;
 
 import com.project.base.dto.BidResponseDTO;
+import com.project.base.dto.MyBidResponseDTO;
 import com.project.base.pojo.*;
 import com.project.base.repository.*;
 import com.project.base.services.BidService;
@@ -119,6 +120,29 @@ public class BidServiceImpl implements BidService {
                 })
                 .toList();
     }
+    @Override
+    public List<MyBidResponseDTO> getBidsByBuyer(Long buyerId) {
+
+        User buyer = userRepo.findById(buyerId)
+                .orElseThrow(() -> new RuntimeException("Buyer not found"));
+
+        List<Bid> bids = bidRepo.findByBidderOrderByBidTimeDesc(buyer);
+
+        return bids.stream().map(bid -> {
+
+            MyBidResponseDTO dto = new MyBidResponseDTO();
+
+            dto.setAuctionId(bid.getAuction().getId());
+            dto.setBrand(bid.getAuction().getCar().getBrand());
+            dto.setModel(bid.getAuction().getCar().getModel());
+            dto.setBidAmount(bid.getBidAmount());
+            dto.setBidTime(bid.getBidTime());
+            dto.setAuctionStatus(bid.getAuction().getStatus().name());
+
+            return dto;
+        }).toList();
+    }
+
 
 
     

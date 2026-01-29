@@ -90,23 +90,27 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
-        // 1. Encode password
+
+        // 1️⃣ Encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // 2. Fix the Roles (This prevents the TransientObjectException)
-        Set<Role> persistentRoles = new HashSet<>();
-        for (Role role : user.getRoles()) {
-            // Fetch the role from DB by its name (e.g., ROLE_SELLER)
-            Role existingRole = roleRepository.findByRoleName(role.getRoleName())
-                    .orElseThrow(() -> new RuntimeException("Error: Role " + role.getRoleName() + " not found in DB."));
-            persistentRoles.add(existingRole);
-        }
-        
-        // 3. Assign the "Persistent" roles back to the user
-        user.setRoles(persistentRoles);
+        // 2️⃣ FORCE DEFAULT ROLE = ROLE_BUYER
+        Role buyerRole = roleRepository
+                .findByRoleName(RoleName.ROLE_BUYER)
+                .orElseThrow(() ->
+                    new RuntimeException("Error: ROLE_BUYER not found in DB")
+                );
 
+        Set<Role> roles = new HashSet<>();
+        roles.add(buyerRole);
+        user.setRoles(roles);
+
+        // 3️⃣ Save user
         userRepo.save(user);
-        return ResponseEntity.ok(new ApiResponse("User registered successfully"));
+
+        return ResponseEntity.ok(
+                new ApiResponse("User registered successfully as BUYER")
+        );
     }
 
     @GetMapping("/ping")

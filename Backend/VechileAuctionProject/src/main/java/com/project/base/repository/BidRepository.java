@@ -1,6 +1,8 @@
 package com.project.base.repository;
 
 import com.project.base.pojo.Bid;
+import com.project.base.pojo.User;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -61,4 +63,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     List<Bid> findBidsByAuctionOrderedDesc(
             @Param("auctionId") Long auctionId
     );
+    List<Bid> findByBidderOrderByBidTimeDesc(User bidder);
+
 }
