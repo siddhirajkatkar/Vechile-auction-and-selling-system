@@ -7,13 +7,15 @@ import Register from "./pages/auth/Register";
 
 /* User Pages */
 import UserDashboard from "./pages/user/UserDashBoard";
-import Auctions from "./pages/user/Auctions";
+import Auctions from "./pages/user/auctions";
 import MyBids from "./pages/user/MyBids";
 import AddCar from "./pages/user/addCar";
 import SubscriptionPlans from "./pages/user/SubscriptionPlans";
 import MySubscription from "./pages/user/MySubscription";
 import MyCars from "./pages/user/MyCars";
 import ViewAuction from "./pages/user/ViewAuction";
+
+import CarsForSale from "./pages/user/CarForSale";
 
 /* Admin Pages */
 import AdminDashboard from "./pages/admin/AdminDashBoard";
@@ -39,6 +41,7 @@ function App() {
       <Route path="/user/subscriptions" element={<SubscriptionPlans />} />
       <Route path="/user/my-subscription" element={<MySubscription />} />
       <Route path="/user/my-cars" element={<MyCars />} />
+      <Route path="/user/car-for-sell" element={<CarsForSale/>}/>
 
       {/* Admin */}
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
