@@ -2,6 +2,12 @@ import React, { useEffect, useState } from "react";
 import { getActiveAuctions } from "../../services/auctionService";
 import { Link } from "react-router-dom";
 
+const statusColor = {
+  ACTIVE: "bg-success",
+  COMPLETED: "bg-secondary",
+  CANCELLED: "bg-danger",
+};
+
 const Auctions = () => {
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,60 +19,119 @@ const Auctions = () => {
 
   const fetchAuctions = async () => {
     try {
-      const response = await getActiveAuctions();
-      setAuctions(response.data);
+      setLoading(true);
+      const res = await getActiveAuctions();
+      setAuctions(Array.isArray(res.data) ? res.data : []);
+      setError("");
     } catch (err) {
-      setError("Failed to load auctions");
+      console.error("AUCTION LOAD ERROR:", err);
+      setError("Failed to load live auctions");
     } finally {
       setLoading(false);
     }
   };
 
+  // ⏳ Remaining time helper
+  const remainingTime = (endTime) => {
+    if (!endTime) return "N/A";
+    const diff = new Date(endTime) - new Date();
+    if (diff <= 0) return "Ended";
+
+    const mins = Math.floor(diff / 60000);
+    const hrs = Math.floor(mins / 60);
+    return hrs > 0 ? `${hrs}h ${mins % 60}m left` : `${mins}m left`;
+  };
+
+  // 🔄 Loading state
   if (loading) {
-    return <h2 style={{ textAlign: "center" }}>Loading auctions...</h2>;
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border text-primary" />
+        <p className="mt-3">Loading live auctions...</p>
+      </div>
+    );
   }
 
+  // ❌ Error state
   if (error) {
-    return <h2 style={{ color: "red", textAlign: "center" }}>{error}</h2>;
+    return (
+      <div className="text-center mt-5 text-danger fw-bold">
+        {error}
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>User Auctions</h1>
+    <div className="container my-5">
 
+      {/* 🔥 Header */}
+      <div
+        className="p-4 mb-5 rounded-4 text-white"
+        style={{
+          background: "linear-gradient(135deg, #0d6efd, #6610f2)",
+        }}
+      >
+        <h1 className="fw-bold mb-1">🔥 Live Auctions</h1>
+        <p className="mb-0 opacity-75">
+          Bid on vehicles before time runs out
+        </p>
+      </div>
+
+      {/* 🚫 No auctions */}
       {auctions.length === 0 ? (
-        <p>No auctions available</p>
+        <div className="text-center text-muted">
+          <h5>No auctions available</h5>
+          <p>Please check back later 🚀</p>
+        </div>
       ) : (
-        <table border="1" width="100%" cellPadding="10">
-          <thead>
-            <tr>
-              <th>Car</th>
-              <th>Current Price</th>
-              <th>Auction Ends</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {auctions.map((auction) => (
-              <tr key={auction.auctionId}>
-                <td>
-                  {auction.brand} {auction.model}
-                </td>
-                <td>₹ {auction.currentPrice}</td>
-                <td>
-                  {new Date(auction.endTime).toLocaleString()}
-                </td>
-                <td>{auction.status}</td>
-                <td>
-                  <Link to={`/user/auction/${auction.auctionId}`}>
-                    View Auction
+        <div className="row g-4">
+          {auctions.map((auction) => (
+            <div
+              key={auction.auctionId}
+              className="col-md-6 col-lg-4"
+            >
+              <div className="card h-100 shadow-sm border-0 rounded-4">
+                <div className="card-body d-flex flex-column">
+
+                  {/* 🚗 Car */}
+                  <h5 className="fw-bold mb-2">
+                    🚗 {auction.brand} {auction.model}
+                  </h5>
+
+                  {/* 💰 Current Bid */}
+                  <div className="mb-2">
+                    <span className="text-muted">Current Bid</span>
+                    <div className="fs-4 fw-bold text-success">
+                      ₹{auction.currentPrice?.toLocaleString()}
+                    </div>
+                  </div>
+
+                  {/* ⏳ Time */}
+                  <span className="badge bg-warning text-dark mb-2">
+                    ⏳ {remainingTime(auction.endTime)}
+                  </span>
+
+                  {/* 🟢 Status */}
+                  <span
+                    className={`badge ${
+                      statusColor[auction.status] || "bg-primary"
+                    } mb-3`}
+                  >
+                    {auction.status}
+                  </span>
+
+                  {/* 👉 View Auction */}
+                  <Link
+                    to={`/user/auction/${auction.auctionId}`}
+                    className="btn btn-outline-primary mt-auto fw-semibold"
+                  >
+                    View Auction →
                   </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

@@ -41,6 +41,11 @@ public interface CarService {
     //List<CarResponseDTO> getCarsBySeller(Long sellerId);
 
     
-    List<CarResponseDTO> getAllCars(); 
+    List<CarResponseDTO> getAllCars();
+
+	/**
+	 * Seller submits car for admin approval
+	 */
+	void submitForApproval(Long carId, Long sellerId); 
 
 }

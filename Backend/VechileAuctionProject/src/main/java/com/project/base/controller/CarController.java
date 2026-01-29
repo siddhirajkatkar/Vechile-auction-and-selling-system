@@ -31,6 +31,9 @@ public class CarController {
 
     // ================= SELLER =================
 
+    /**
+     * Seller adds a new car (saved as DRAFT)
+     */
     @PostMapping(
         value = "/add",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -49,12 +52,31 @@ public class CarController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse(
-                        "Car listed successfully with ID: " + savedCar.getId()
+                        "Car saved as DRAFT with ID: " + savedCar.getId()
                 ));
+    }
+
+    /**
+     * Seller submits car for admin approval
+     */
+    @PutMapping("/submit/{carId}")
+    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    public ResponseEntity<ApiResponse> submitForApproval(
+            @PathVariable Long carId) {
+
+        Long sellerId = userService.getCurrentUser().getId();
+        carService.submitForApproval(carId, sellerId);
+
+        return ResponseEntity.ok(
+                new ApiResponse("Car submitted for admin approval")
+        );
     }
 
     // ================= BUYER / PUBLIC =================
 
+    /**
+     * Get all approved & available cars
+     */
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<CarResponseDTO>> getAvailableCars() {
@@ -63,9 +85,51 @@ public class CarController {
 
     // ================= ADMIN =================
 
+    /**
+     * Get all cars (admin only)
+     */
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<List<CarResponseDTO>> getAllCars() {
         return ResponseEntity.ok(carService.getAllCars());
+    }
+
+    /**
+     * Get all cars pending approval
+     */
+    @GetMapping("/pending")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<List<CarResponseDTO>> getPendingCars() {
+        return ResponseEntity.ok(carService.getPendingCars());
+    }
+
+    /**
+     * Approve a car (make it AVAILABLE)
+     */
+    @PutMapping("/approve/{carId}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse> approveCar(
+            @PathVariable Long carId) {
+
+        carService.approveCar(carId);
+
+        return ResponseEntity.ok(
+                new ApiResponse("Car approved and is now available")
+        );
+    }
+
+    /**
+     * Reject a car
+     */
+    @PutMapping("/reject/{carId}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse> rejectCar(
+            @PathVariable Long carId) {
+
+        carService.rejectCar(carId);
+
+        return ResponseEntity.ok(
+                new ApiResponse("Car rejected by admin")
+        );
     }
 }

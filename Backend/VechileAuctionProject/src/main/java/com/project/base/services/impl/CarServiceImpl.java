@@ -13,7 +13,6 @@ import com.project.base.services.ImageStorageService;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,23 +26,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
 
-    @Autowired
-    private CarRepository carRepo;
-    
-    private final  CarImageRepository carImageRepository;
+    private final CarRepository carRepo;
+    private final CarImageRepository carImageRepository;
+    private final UserRepository userRepo;
+    private final ImageStorageService imageStorageService;
 
-    @Autowired
-    private UserRepository userRepo;
+    // ================= SELLER =================
 
-
-	private  final ImageStorageService imageStorageService;
-
-
-    // ================= ADD NEW CAR =================
-
+    /**
+     * Seller adds a car → saved as DRAFT
+     */
     @Override
     public Car addNewCar(CarDto carDto, MultipartFile[] images, Long sellerId) {
-
 
         Car car = new Car();
         car.setRegistrationNo(carDto.getRegistrationNo());
@@ -60,16 +54,18 @@ public class CarServiceImpl implements CarService {
         car.setPrice(carDto.getPrice());
         car.setColor(carDto.getColor());
         car.setDescription(carDto.getDescription());
-        car.setStatus(Status.PENDING_APPROVAL);
+
+        // ✅ Correct status
+        car.setStatus(Status.DRAFT);
 
         car.setSeller(
                 userRepo.findById(sellerId)
                         .orElseThrow(() -> new RuntimeException("Seller not found"))
         );
 
-        Car savedCar = carRepo.save(car); // Save car first
+        Car savedCar = carRepo.save(car);
 
-        // 2️⃣ Save Images and link to car
+        // Save images
         if (images != null && images.length > 0) {
             try {
                 List<String> imageUrls = imageStorageService.storeImages(images);
@@ -77,8 +73,8 @@ public class CarServiceImpl implements CarService {
                 for (String url : imageUrls) {
                     CarImage carImage = new CarImage();
                     carImage.setCar(savedCar);
-                    carImage.setImageUrl(url); // Store the path returned by ImageStorageService
-                   carImageRepository.save(carImage); // Save image record in DB
+                    carImage.setImageUrl(url);
+                    carImageRepository.save(carImage);
                 }
             } catch (IOException e) {
                 throw new RuntimeException("Failed to store images", e);
@@ -88,9 +84,28 @@ public class CarServiceImpl implements CarService {
         return savedCar;
     }
 
+    /**
+     * Seller submits car for admin approval
+     */
+    @Override
+    public void submitForApproval(Long carId, Long sellerId) {
+
+        Car car = carRepo.findById(carId)
+                .orElseThrow(() -> new RuntimeException("Car not found"));
+
+        if (!car.getSeller().getId().equals(sellerId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        if (car.getStatus() != Status.DRAFT) {
+            throw new RuntimeException("Only DRAFT cars can be submitted");
+        }
+
+        car.setStatus(Status.PENDING_APPROVAL);
+        carRepo.save(car);
+    }
 
     // ================= ADMIN =================
-
 
     @Override
     public List<CarResponseDTO> getPendingCars() {
@@ -102,21 +117,33 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public Car approveCar(Long carId) {
+
         Car car = carRepo.findById(carId)
                 .orElseThrow(() -> new RuntimeException("Car not found"));
+
+        if (car.getStatus() != Status.PENDING_APPROVAL) {
+            throw new RuntimeException("Car is not pending approval");
+        }
+
         car.setStatus(Status.AVAILABLE);
         return carRepo.save(car);
     }
 
     @Override
     public Car rejectCar(Long carId) {
+
         Car car = carRepo.findById(carId)
                 .orElseThrow(() -> new RuntimeException("Car not found"));
+
+        if (car.getStatus() != Status.PENDING_APPROVAL) {
+            throw new RuntimeException("Car is not pending approval");
+        }
+
         car.setStatus(Status.CANCELLED);
         return carRepo.save(car);
     }
 
-    // ================= USER / BUYER =================
+    // ================= BUYER / PUBLIC =================
 
     @Override
     public List<CarResponseDTO> getAllAvailableCars() {
@@ -134,12 +161,8 @@ public class CarServiceImpl implements CarService {
                 .collect(Collectors.toList());
     }
 
-    // ================= ENTITY → DTO MAPPER =================
+    // ================= ENTITY → DTO =================
 
-    /**
-     * Converts Car entity into CarResponseDTO.
-     * Safe for JSON serialization (no lazy loading issues).
-     */
     private CarResponseDTO convertToDto(Car car) {
 
         CarResponseDTO dto = new CarResponseDTO();
@@ -161,25 +184,6 @@ public class CarServiceImpl implements CarService {
         dto.setSaleType(car.getSaleType());
         dto.setStatus(car.getStatus());
 
-        // Seller name
-//        if (car.getSeller() != null) {
-//            dto.setSellerName(
-//                car.getSeller().getFirstName() + " " +
-//                car.getSeller().getLastName()
-//            );
-//        }
-
-        // Image URLs
-//        if (car.getImages() != null && !car.getImages().isEmpty()) {
-//            dto.setImages(
-//                car.getImages()
-//                    .stream()
-//                    .map(img -> img.getImageUrl())
-//                    .collect(Collectors.toList())
-//            );
-//        }
-
         return dto;
     }
-
 }

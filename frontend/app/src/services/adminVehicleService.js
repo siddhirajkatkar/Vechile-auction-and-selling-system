@@ -1,15 +1,18 @@
-import axios from "axios";
+import axiosInstance from "./axios";
 
-const BASE_URL = "http://localhost:8080/admin/cars";
+// Base path must match backend controller
+const BASE_URL = "/api/cars";
+
+// ================= ADMIN VEHICLE APIs =================
 
 export const getPendingVehicles = () => {
-  return axios.get(`${BASE_URL}/pending`);
+  return axiosInstance.get(`${BASE_URL}/pending`);
 };
 
 export const approveVehicle = (id) => {
-  return axios.put(`${BASE_URL}/${id}/approve`);
+  return axiosInstance.put(`${BASE_URL}/approve/${id}`);
 };
 
 export const rejectVehicle = (id) => {
-  return axios.put(`${BASE_URL}/${id}/reject`);
+  return axiosInstance.put(`${BASE_URL}/reject/${id}`);
 };

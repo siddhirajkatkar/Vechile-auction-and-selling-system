@@ -36,11 +36,12 @@ public class UserCarServiceImpl implements UserCarService{
 
 	    @Override
 	    public List<CarResponseDTO> getCarsBySeller(Long sellerId) {
+
 	        List<Car> cars = carRepo.findBySellerId(sellerId);
 
-	        // Convert Car -> CarDto (including images)
 	        return cars.stream().map(car -> {
-	        	CarResponseDTO dto = new CarResponseDTO();
+
+	            CarResponseDTO dto = new CarResponseDTO();
 	            dto.setId(car.getId());
 	            dto.setRegistrationNo(car.getRegistrationNo());
 	            dto.setBrand(car.getBrand());
@@ -57,11 +58,14 @@ public class UserCarServiceImpl implements UserCarService{
 	            dto.setDescription(car.getDescription());
 	            dto.setSaleType(car.getSaleType());
 
-	            // Add images
-	            List<CarImage> imagesList = car.getImages();
-	            dto.setImages(imagesList); // Add a List<CarImage> field in CarDto
+	            // ✅ VERY IMPORTANT
+	            dto.setStatus(car.getStatus());
+
+	            // Images
+	            dto.setImages(car.getImages());
 
 	            return dto;
 	        }).collect(Collectors.toList());
 	    }
+
 }

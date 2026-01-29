@@ -55,7 +55,7 @@ public class SubscriptionController {
     // VIEW CURRENT USER SUBSCRIPTION
     // ===============================
     @GetMapping("/me")
-    @PreAuthorize("hasAuthority('ROLE_BUYER')")
+    @PreAuthorize("hasAuthority('ROLE_BUYER') or hasAuthority('ROLE_SELLER')")  
     public ResponseEntity<UserSubscription> mySubscription() {
 
         Long userId = userService.getCurrentUser().getId();

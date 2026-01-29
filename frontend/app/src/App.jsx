@@ -13,6 +13,7 @@ import AddCar from "./pages/user/addCar";
 import SubscriptionPlans from "./pages/user/SubscriptionPlans";
 import MySubscription from "./pages/user/MySubscription";
 import MyCars from "./pages/user/MyCars";
+import ViewAuction from "./pages/user/ViewAuction";
 
 /* Admin Pages */
 import AdminDashboard from "./pages/admin/AdminDashBoard";
@@ -32,8 +33,9 @@ function App() {
       {/* User */}
       <Route path="/user/dashboard" element={<UserDashboard />} />
       <Route path="/user/auctions" element={<Auctions />} />
+      <Route path="/user/auction/:auctionId" element={<ViewAuction />} />
       <Route path="/user/bids" element={<MyBids />} />
-    //  <Route path="/user/add-car" element={<AddCar />} />
+      <Route path="/user/add-car" element={<AddCar />} />
       <Route path="/user/subscriptions" element={<SubscriptionPlans />} />
       <Route path="/user/my-subscription" element={<MySubscription />} />
       <Route path="/user/my-cars" element={<MyCars />} />

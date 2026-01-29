@@ -25,7 +25,7 @@ public class AuctionController {
     // ================= BUYER =================
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ROLE_BUYER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_BUYER','ROLE_SELLER')")
     public ResponseEntity<List<AuctionResponseDTO>> viewAuctions() {
 
         Long userId = userService.getCurrentUser().getId();
@@ -50,4 +50,14 @@ public class AuctionController {
                 new ApiResponse("Auction started successfully")
         );
     }
+    @GetMapping("/{auctionId}")
+    @PreAuthorize("hasAuthority('ROLE_BUYER') or hasAuthority('ROLE_SELLER')")
+    public ResponseEntity<AuctionResponseDTO> getAuctionById(
+            @PathVariable Long auctionId) {
+
+        return ResponseEntity.ok(
+                auctionService.getAuctionById(auctionId)
+        );
+    }
+
 }

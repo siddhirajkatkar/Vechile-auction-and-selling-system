@@ -22,4 +22,7 @@ public interface AuctionService {
      * Applies status, cooldown, and attempt validations.
      */
     void startAuction(Long carId, Long sellerId);
+    
+    AuctionResponseDTO getAuctionById(Long auctionId);
+
 }
