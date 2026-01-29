@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.project.base.dto.ApiResponse;
 import com.project.base.dto.CarDto;
 import com.project.base.dto.CarResponseDTO;
 import com.project.base.pojo.Car;
@@ -67,6 +68,23 @@ public class UserCarServiceImpl implements UserCarService{
 
 	            return dto;
 	        }).collect(Collectors.toList());
+	    }
+	    
+
+	    @Override
+	    public ApiResponse deleteCar(Long carId, Long sellerId) {
+	        // Fetch car
+	        Car car = carRepo.findById(carId)
+	                .orElseThrow(() -> new RuntimeException("Car not found"));
+
+	        // Check if the current user is the seller
+	        if (!car.getSeller().getId().equals(sellerId)) {
+	            throw new RuntimeException("You are not authorized to delete this car");
+	        }
+
+	        // Delete the car (images will be deleted due to cascade)
+	        carRepo.delete(car);
+	        return new ApiResponse("Car Deleted Successfully");
 	    }
 
 }
