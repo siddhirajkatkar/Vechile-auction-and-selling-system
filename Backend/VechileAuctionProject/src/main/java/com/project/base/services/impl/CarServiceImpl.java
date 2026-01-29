@@ -35,11 +35,16 @@ public class CarServiceImpl implements CarService {
     @Autowired
     private UserRepository userRepo;
 
+
 	private  final ImageStorageService imageStorageService;
+
+
+    // ================= ADD NEW CAR =================
 
     @Override
     public Car addNewCar(CarDto carDto, MultipartFile[] images, Long sellerId) {
-        // 1️⃣ Create Car entity
+
+
         Car car = new Car();
         car.setRegistrationNo(carDto.getRegistrationNo());
         car.setBrand(carDto.getBrand());
@@ -57,8 +62,10 @@ public class CarServiceImpl implements CarService {
         car.setDescription(carDto.getDescription());
         car.setStatus(Status.PENDING_APPROVAL);
 
-        car.setSeller(userRepo.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found")));
+        car.setSeller(
+                userRepo.findById(sellerId)
+                        .orElseThrow(() -> new RuntimeException("Seller not found"))
+        );
 
         Car savedCar = carRepo.save(car); // Save car first
 
@@ -82,9 +89,13 @@ public class CarServiceImpl implements CarService {
     }
 
 
+    // ================= ADMIN =================
+
+
     @Override
     public List<CarResponseDTO> getPendingCars() {
-        return carRepo.findByStatus(Status.PENDING_APPROVAL).stream()
+        return carRepo.findByStatus(Status.PENDING_APPROVAL)
+                .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -105,44 +116,70 @@ public class CarServiceImpl implements CarService {
         return carRepo.save(car);
     }
 
+    // ================= USER / BUYER =================
+
     @Override
     public List<CarResponseDTO> getAllAvailableCars() {
-        return carRepo.findByStatus(Status.AVAILABLE).stream()
+        return carRepo.findByStatus(Status.AVAILABLE)
+                .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<CarResponseDTO> getAllCars() {
-        return carRepo.findAll().stream()
+        return carRepo.findAll()
+                .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
+    // ================= ENTITY → DTO MAPPER =================
+
     /**
-     * Helper method to convert Car Entity to CarResponseDTO.
-     * This ensures all Lazy-loaded fields are accessed within the transaction.
+     * Converts Car entity into CarResponseDTO.
+     * Safe for JSON serialization (no lazy loading issues).
      */
     private CarResponseDTO convertToDto(Car car) {
+
         CarResponseDTO dto = new CarResponseDTO();
+
         dto.setId(car.getId());
         dto.setRegistrationNo(car.getRegistrationNo());
         dto.setBrand(car.getBrand());
+        dto.setManufacturer(car.getManufacturer());
         dto.setModel(car.getModel());
         dto.setManufactureYear(car.getManufactureYear());
+        dto.setFuelType(car.getFuelType());
+        dto.setTransmission(car.getTransmission());
+        dto.setKmDriven(car.getKmDriven());
+        dto.setMileage(car.getMileage());
+        dto.setColor(car.getColor());
+        dto.setEngineCc(car.getEngineCc());
         dto.setPrice(car.getPrice());
-//        dto.setStatus(car.getStatus().name());
+        dto.setDescription(car.getDescription());
+        dto.setSaleType(car.getSaleType());
+        dto.setStatus(car.getStatus());
 
-        if (car.getSeller() != null) {
-//            dto.setSellerName(car.getSeller().getFirstName() + " " + car.getSeller().getLastName());
-        }
+        // Seller name
+//        if (car.getSeller() != null) {
+//            dto.setSellerName(
+//                car.getSeller().getFirstName() + " " +
+//                car.getSeller().getLastName()
+//            );
+//        }
 
-//        if (car.getImages() != null) {
-////            dto.setImageUrls(car.getImages().stream()
+        // Image URLs
+//        if (car.getImages() != null && !car.getImages().isEmpty()) {
+//            dto.setImages(
+//                car.getImages()
+//                    .stream()
 //                    .map(img -> img.getImageUrl())
-//                    .collect(Collectors.toList()));
+//                    .collect(Collectors.toList())
+//            );
 //        }
 
         return dto;
     }
+
 }

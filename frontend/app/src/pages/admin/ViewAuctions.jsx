@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getOngoingAuctions } from "../../services/auctionService";
+import { getUserAuctions } from "../../services/auctionService";
 
 const ViewAuctions = () => {
   const [auctions, setAuctions] = useState([]);
@@ -13,11 +13,12 @@ const ViewAuctions = () => {
   const loadAuctions = async () => {
     try {
       setLoading(true);
-      const res = await getOngoingAuctions();
+      const res = await getUserAuctions();
       setAuctions(res.data || []);
       setError("");
     } catch (err) {
-      setError("Unable to load auctions. Backend not ready.");
+      console.error("AUCTION LOAD ERROR:", err);
+      setError("Unable to load auctions.");
       setAuctions([]);
     } finally {
       setLoading(false);
@@ -46,15 +47,25 @@ const ViewAuctions = () => {
       )}
 
       {/* Auctions list */}
-      {!loading && !error && auctions.length > 0 && (
+      {!loading && !error && auctions.length > 0 &&
         auctions.map((a) => (
           <div key={a.auctionId} className="card p-3 mb-3">
-            <p><b>Car:</b> {a.carName}</p>
-            <p><b>Highest Bid:</b> ₹{a.highestBid}</p>
-            <p><b>Status:</b> {a.status}</p>
+            <p>
+              <b>Car:</b>{" "}
+              {a.car ? `${a.car.brand} ${a.car.model}` : "N/A"}
+            </p>
+
+            <p>
+              <b>Start Price:</b> ₹{a.startPrice}
+            </p>
+
+            <p>
+              <b>Status:</b>{" "}
+              <span className="badge bg-success">{a.status}</span>
+            </p>
           </div>
         ))
-      )}
+      }
     </div>
   );
 };

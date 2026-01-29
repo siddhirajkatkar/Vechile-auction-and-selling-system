@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../../services/axios"; // adjust path if needed
+import { getActiveAuctions } from "../../services/auctionService";
 import { Link } from "react-router-dom";
 
 const Auctions = () => {
@@ -13,8 +13,7 @@ const Auctions = () => {
 
   const fetchAuctions = async () => {
     try {
-      const response = await axios.get("/user/auctions"); 
-      // example API: GET /user/auctions
+      const response = await getActiveAuctions();
       setAuctions(response.data);
     } catch (err) {
       setError("Failed to load auctions");
@@ -42,23 +41,25 @@ const Auctions = () => {
           <thead>
             <tr>
               <th>Car</th>
-              <th>Year</th>
-              <th>Fuel</th>
-              <th>Base Price</th>
+              <th>Current Price</th>
+              <th>Auction Ends</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {auctions.map((auction) => (
-              <tr key={auction.id}>
-                <td>{auction.brand} {auction.model}</td>
-                <td>{auction.manufactureYear}</td>
-                <td>{auction.fuelType}</td>
-                <td>₹ {auction.basePrice}</td>
+              <tr key={auction.auctionId}>
+                <td>
+                  {auction.brand} {auction.model}
+                </td>
+                <td>₹ {auction.currentPrice}</td>
+                <td>
+                  {new Date(auction.endTime).toLocaleString()}
+                </td>
                 <td>{auction.status}</td>
                 <td>
-                  <Link to={`/user/auction/${auction.id}`}>
+                  <Link to={`/user/auction/${auction.auctionId}`}>
                     View Auction
                   </Link>
                 </td>

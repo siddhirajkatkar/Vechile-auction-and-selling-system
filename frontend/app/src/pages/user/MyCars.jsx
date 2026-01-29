@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../services/axios";
 import { useNavigate } from "react-router-dom";
@@ -5,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 const MyCars = () => {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
   // Fetch user's cars and clean circular references
@@ -97,6 +99,7 @@ const MyCars = () => {
             </div>
           ))}
         </div>
+
       )}
     </div>
   );

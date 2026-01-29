@@ -33,4 +33,9 @@ public class UserSubscription {
 
     @Column(name = "end_date")
     private LocalDateTime endDate;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SubscriptionStatus status;
+
 }

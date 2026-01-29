@@ -1,5 +1,6 @@
 package com.project.base.pojo;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,12 +38,12 @@ public class Car extends BaseEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "fuel_type", nullable = false, length = 20) // ✅ Added length
+    @Column(name = "fuel_type", nullable = false, length = 20)
     private FuelType fuelType;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20) // ✅ Added length
+    @Column(nullable = false, length = 20)
     private Transmission transmission;
 
     @PositiveOrZero
@@ -62,36 +63,61 @@ public class Car extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
- // In Car.java
-    @JsonManagedReference // ✅ Tells Jackson to fetch the images
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER) 
+    // ================= IMAGES =================
+    @JsonManagedReference
+    @OneToMany(
+        mappedBy = "car",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.EAGER
+    )
     private List<CarImage> images = new ArrayList<>();
 
+    // ================= SALE & STATUS =================
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "sale_type", nullable = false, length = 20) // ✅ Added length
+    @Column(name = "sale_type", nullable = false, length = 20)
     private SaleType saleType;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30) // ✅ Fix: Length 30 accommodates "PENDING_APPROVAL"
+    @Column(nullable = false, length = 30)
     private Status status;
 
- // In Car.java
-
+    // ================= SELLER =================
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "roles"}) // ✅ Add this
+    @JsonIgnoreProperties({
+        "hibernateLazyInitializer",
+        "handler",
+        "password",
+        "roles"
+    })
     private User seller;
-    
- // Inside Car.java
 
+    // ================= VEHICLE DETAILS =================
     @NotBlank
-    @Column(nullable = false) // Matches the 'NO' in your DB Null column
-    private String manufacturer; // ✅ Add this field
+    @Column(nullable = false)
+    private String manufacturer;
 
     @PositiveOrZero
-    @Column(name = "km_driven", nullable = false) // ✅ Ensure this matches the DB too
+    @Column(name = "km_driven", nullable = false)
     private Integer kmDriven;
+
+    // ================= AUCTION CONTROL (NEW) =================
+
+    /**
+     * Number of completed auctions for this car.
+     * Used to enforce max auction attempts (e.g., 3).
+     */
+    @Column(name = "auction_attempts", nullable = false)
+    private int auctionAttempts = 0;
+
+    /**
+     * Timestamp when the last auction ended (sold or unsold).
+     * Used to enforce cooldown (e.g., 24 hours).
+     */
+    @Column(name = "last_auction_ended_at")
+    private LocalDateTime lastAuctionEndedAt;
 }

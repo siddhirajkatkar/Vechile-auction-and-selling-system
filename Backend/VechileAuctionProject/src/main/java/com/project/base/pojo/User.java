@@ -2,7 +2,10 @@ package com.project.base.pojo;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -57,6 +60,11 @@ public class User extends BaseEntity {
 
 //    @Column(name = "created_at", updatable = false)
 //    private LocalDateTime createdAt;
+    
+    @OneToMany(mappedBy = "bidder", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Bid> bids;
+
 
     //Business constructor (User Registration)
     public User(String firstName,
