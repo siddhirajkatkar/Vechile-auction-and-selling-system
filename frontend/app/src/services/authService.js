@@ -5,7 +5,7 @@ const API_BASE_URL = "http://localhost:8080";
 // LOGIN (if you add it later)
 export const login = async (email, password) => {
   const response = await axios.post(
-    `${API_BASE_URL}/auth/login`,
+    `${API_BASE_URL}/api/auth/login`,
     { email, password },
     {
       headers: {
@@ -19,7 +19,7 @@ export const login = async (email, password) => {
 
 // REGISTER (THIS MATCHES BACKEND)
 export const register = async (userData) => {
-  return axios.post(`${API_BASE_URL}/user/register`, userData);
+  return axios.post(`${API_BASE_URL}/api/auth/register`, userData);
 };
 
 // LOGOUT

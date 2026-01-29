@@ -10,33 +10,31 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleLogin = async () => {
+    console.log("LOGIN BUTTON CLICKED");
 
-  try {
-    const data = await login(email, password);
+    try {
+      const data = await login(email, password);
 
-    console.log("LOGIN RESPONSE:", data);
-    console.log("ROLE FROM BACKEND:", data.role);
-// Clean old data
-localStorage.clear();
+      console.log("LOGIN RESPONSE", data);
 
-// Save new data
-localStorage.setItem("token", data.token);
-localStorage.setItem("role", data.role);
+      // Save auth info
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
 
-// Role-based redirection
-if (data.role === "ROLE_ADMIN") {
-  navigate("/admin/dashboard", { replace: true });
-} else {
-  navigate("/user/dashboard", { replace: true });
-}
+      setMessage("Login Successful");
 
-  } catch (error) {
-    setMessage("Login failed. Check your email or password.");
-  }
-};
-
+      // Redirect based on role
+      if (data.role === "ROLE_ADMIN") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/user/dashboard");
+      }
+    } catch (error) {
+      console.error("LOGIN ERROR", error);
+      setMessage("Login failed. Check your email or password.");
+    }
+  };
 
   return (
     <div className="d-flex flex-column vh-100">
@@ -60,7 +58,12 @@ if (data.role === "ROLE_ADMIN") {
             </p>
           )}
 
-          <form onSubmit={handleSubmit}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin();
+            }}
+          >
             <div className="mb-3">
               <input
                 type="email"

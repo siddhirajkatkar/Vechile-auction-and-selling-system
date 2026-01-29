@@ -18,7 +18,7 @@ public interface CarService {
      * ADMIN FUNCTIONALITY
      * Logic: Fetch all cars currently waiting for approval
      */
-    List<Car> getPendingCars();
+    List<CarResponseDTO> getPendingCars();
 
     /**
      * ADMIN FUNCTIONALITY

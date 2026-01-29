@@ -3,53 +3,90 @@ import { getAllUsers, makeAdmin } from "../../services/adminUserService";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadUsers();
   }, []);
 
   const loadUsers = async () => {
-    const res = await getAllUsers();
-    setUsers(res.data);
+    try {
+      setLoading(true);
+      const res = await getAllUsers();
+      setUsers(res.data || []);
+      setError("");
+    } catch (err) {
+      setError("Unable to load users. Backend not ready.");
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const promoteUser = async (id) => {
-    await makeAdmin(id);
-    loadUsers();
+    try {
+      await makeAdmin(id);
+      loadUsers();
+    } catch (err) {
+      alert("Failed to promote user");
+    }
   };
 
   return (
     <div className="container mt-4">
       <h3>Manage Users</h3>
 
-      <table className="table mt-3">
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+      {/* Loading state */}
+      {loading && (
+        <p className="text-muted mt-3">Loading users...</p>
+      )}
 
-        <tbody>
-          {users.map((u) => (
-            <tr key={u.userId}>
-              <td>{u.email}</td>
-              <td>{u.role}</td>
-              <td>
-                {u.role !== "ROLE_ADMIN" && (
-                  <button
-                    className="btn btn-sm btn-primary"
-                    onClick={() => promoteUser(u.userId)}
-                  >
-                    Make Admin
-                  </button>
-                )}
-              </td>
+      {/* Error state */}
+      {!loading && error && (
+        <p className="text-danger mt-3">{error}</p>
+      )}
+
+      {/* No users */}
+      {!loading && !error && users.length === 0 && (
+        <p className="text-muted mt-3">
+          No users available to manage.
+        </p>
+      )}
+
+      {/* Users table */}
+      {!loading && !error && users.length > 0 && (
+        <table className="table mt-3">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {users.map((u) => (
+              <tr key={u.userId}>
+                <td>{u.email}</td>
+                <td>{u.role}</td>
+                <td>
+                  {u.role !== "ROLE_ADMIN" ? (
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => promoteUser(u.userId)}
+                    >
+                      Make Admin
+                    </button>
+                  ) : (
+                    <span className="text-success">Admin</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };

@@ -2,9 +2,13 @@ package com.project.base.services.impl;
 
 import com.project.base.dto.UserDTO;
 import com.project.base.pojo.User;
+import com.project.base.pojo.UserStatus;
 import com.project.base.repository.UserRepository;
 import com.project.base.security.MyUserDetails;
 import com.project.base.services.UserService;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,4 +38,16 @@ public class UserServiceImpl implements UserService {
         // Your registration logic here
         return "User Registered";
     }
+
+	@Override
+	public List<User> getAllUsers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateUserStatus(Long userId, UserStatus status) {
+		// TODO Auto-generated method stub
+		
+	}
 }

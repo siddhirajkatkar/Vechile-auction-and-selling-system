@@ -28,37 +28,32 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public Car addNewCar(CarDto carDto, MultipartFile[] images, Long sellerId) {
-
         Car car = new Car();
-
         car.setRegistrationNo(carDto.getRegistrationNo());
         car.setBrand(carDto.getBrand());
         car.setModel(carDto.getModel());
         car.setManufactureYear(carDto.getManufactureYear());
-
         car.setFuelType(carDto.getFuelType());
         car.setTransmission(carDto.getTransmission());
         car.setSaleType(carDto.getSaleType());
-
         car.setMileage(carDto.getMileage());
         car.setEngineCc(carDto.getEngineCc());
         car.setPrice(carDto.getPrice());
-
         car.setColor(carDto.getColor());
         car.setDescription(carDto.getDescription());
         car.setStatus(Status.PENDING_APPROVAL);
 
-        car.setSeller(
-            userRepo.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found"))
-        );
+        car.setSeller(userRepo.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller not found")));
 
         return carRepo.save(car);
     }
 
     @Override
-    public List<Car> getPendingCars() {
-        return carRepo.findByStatus(Status.PENDING_APPROVAL);
+    public List<CarResponseDTO> getPendingCars() {
+        return carRepo.findByStatus(Status.PENDING_APPROVAL).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -79,57 +74,42 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<CarResponseDTO> getAllAvailableCars() {
-        List<Car> cars = carRepo.findByStatus(Status.AVAILABLE);
-
-        return cars.stream().map(car -> {
-            CarResponseDTO dto = new CarResponseDTO();
-            dto.setId(car.getId());
-            dto.setRegistrationNo(car.getRegistrationNo());
-            dto.setBrand(car.getBrand());
-            dto.setModel(car.getModel());
-            dto.setManufactureYear(car.getManufactureYear());
-            dto.setPrice(car.getPrice());
-            dto.setStatus(car.getStatus().name());
-
-            if (car.getSeller() != null) {
-                dto.setSellerName(
-                    car.getSeller().getFirstName() + " " +
-                    car.getSeller().getLastName()
-                );
-            }
-
-            dto.setImageUrls(
-                car.getImages()
-                    .stream()
-                    .map(img -> img.getImageUrl())
-                    .collect(Collectors.toList())
-            );
-
-            return dto;
-        }).collect(Collectors.toList());
+        return carRepo.findByStatus(Status.AVAILABLE).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<CarResponseDTO> getAllCars() {
+        return carRepo.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
 
-        return carRepo.findAll().stream().map(car -> {
-            CarResponseDTO dto = new CarResponseDTO();
-            dto.setId(car.getId());
-            dto.setBrand(car.getBrand());
-            dto.setModel(car.getModel());
-            dto.setPrice(car.getPrice());
-            dto.setStatus(car.getStatus().name());
-            dto.setSellerName(
-                car.getSeller().getFirstName() + " " +
-                car.getSeller().getLastName()
-            );
-            dto.setImageUrls(
-                car.getImages()
-                    .stream()
-                    .map(i -> i.getImageUrl())
-                    .collect(Collectors.toList())
-            );
-            return dto;
-        }).collect(Collectors.toList());
+    /**
+     * Helper method to convert Car Entity to CarResponseDTO.
+     * This ensures all Lazy-loaded fields are accessed within the transaction.
+     */
+    private CarResponseDTO convertToDto(Car car) {
+        CarResponseDTO dto = new CarResponseDTO();
+        dto.setId(car.getId());
+        dto.setRegistrationNo(car.getRegistrationNo());
+        dto.setBrand(car.getBrand());
+        dto.setModel(car.getModel());
+        dto.setManufactureYear(car.getManufactureYear());
+        dto.setPrice(car.getPrice());
+        dto.setStatus(car.getStatus().name());
+
+        if (car.getSeller() != null) {
+            dto.setSellerName(car.getSeller().getFirstName() + " " + car.getSeller().getLastName());
+        }
+
+        if (car.getImages() != null) {
+            dto.setImageUrls(car.getImages().stream()
+                    .map(img -> img.getImageUrl())
+                    .collect(Collectors.toList()));
+        }
+
+        return dto;
     }
 }
