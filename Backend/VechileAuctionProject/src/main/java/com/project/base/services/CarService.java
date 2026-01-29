@@ -38,6 +38,9 @@ public interface CarService {
      */
     List<CarResponseDTO> getAllAvailableCars();
     
+    //List<CarResponseDTO> getCarsBySeller(Long sellerId);
+
+    
     List<CarResponseDTO> getAllCars(); 
 
 }

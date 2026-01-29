@@ -1,6 +1,7 @@
 package com.project.base.controller;
 
-import com.project.base.pojo.Auction;
+import com.project.base.dto.AuctionResponseDTO;
+import com.project.base.dto.ApiResponse;
 import com.project.base.services.AuctionService;
 import com.project.base.services.UserService;
 
@@ -21,15 +22,32 @@ public class AuctionController {
     @Autowired
     private UserService userService;
 
-    // BUYER can view auctions only if subscription is valid
+    // ================= BUYER =================
+
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_BUYER')")
-    public ResponseEntity<List<Auction>> viewAuctions() {
+    public ResponseEntity<List<AuctionResponseDTO>> viewAuctions() {
 
         Long userId = userService.getCurrentUser().getId();
 
         return ResponseEntity.ok(
                 auctionService.viewActiveAuctions(userId)
+        );
+    }
+
+    // ================= SELLER =================
+
+    @PostMapping("/start/{carId}")
+    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    public ResponseEntity<ApiResponse> startAuction(
+            @PathVariable Long carId) {
+
+        Long sellerId = userService.getCurrentUser().getId();
+
+        auctionService.startAuction(carId, sellerId);
+
+        return ResponseEntity.ok(
+                new ApiResponse("Auction started successfully")
         );
     }
 }

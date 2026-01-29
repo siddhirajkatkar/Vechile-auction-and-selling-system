@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getUserAuctions } from "../../services/auctionService";
+import { getActiveAuctions } from "../../services/auctionService";
 import { Link } from "react-router-dom";
 
 const Auctions = () => {
@@ -13,7 +13,7 @@ const Auctions = () => {
 
   const fetchAuctions = async () => {
     try {
-      const response = await getUserAuctions();
+      const response = await getActiveAuctions();
       setAuctions(response.data);
     } catch (err) {
       setError("Failed to load auctions");
@@ -41,9 +41,8 @@ const Auctions = () => {
           <thead>
             <tr>
               <th>Car</th>
-              <th>Year</th>
-              <th>Fuel</th>
-              <th>Start Price</th>
+              <th>Current Price</th>
+              <th>Auction Ends</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
@@ -52,11 +51,12 @@ const Auctions = () => {
             {auctions.map((auction) => (
               <tr key={auction.auctionId}>
                 <td>
-                  {auction.car?.brand} {auction.car?.model}
+                  {auction.brand} {auction.model}
                 </td>
-                <td>{auction.car?.manufactureYear}</td>
-                <td>{auction.car?.fuelType}</td>
-                <td>₹ {auction.startPrice}</td>
+                <td>₹ {auction.currentPrice}</td>
+                <td>
+                  {new Date(auction.endTime).toLocaleString()}
+                </td>
                 <td>{auction.status}</td>
                 <td>
                   <Link to={`/user/auction/${auction.auctionId}`}>

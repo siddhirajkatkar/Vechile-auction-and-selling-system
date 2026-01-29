@@ -29,11 +29,13 @@ public class CarController {
     @Autowired
     private CarService carService;
 
+    // ================= SELLER =================
+
     @PostMapping(
         value = "/add",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-//    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_SELLER')")
     public ResponseEntity<ApiResponse> addCar(
             @RequestPart("carData") String carDataJson,
             @RequestPart(value = "images", required = false) MultipartFile[] images
@@ -44,16 +46,22 @@ public class CarController {
 
         Long sellerId = userService.getCurrentUser().getId();
         Car savedCar = carService.addNewCar(carDto, images, sellerId);
-        
+
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse("Car listed successfully with ID: " + savedCar.getId()));
+                .body(new ApiResponse(
+                        "Car listed successfully with ID: " + savedCar.getId()
+                ));
     }
+
+    // ================= BUYER / PUBLIC =================
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<CarResponseDTO>> getAvailableCars() {
         return ResponseEntity.ok(carService.getAllAvailableCars());
     }
+
+    // ================= ADMIN =================
 
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

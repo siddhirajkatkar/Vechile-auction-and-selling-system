@@ -1,36 +1,23 @@
 package com.project.base.pojo;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "auctions")
-public class Auction {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "auction_id")
-    private Long auctionId;
+@AttributeOverride(name = "id", column = @Column(name = "auction_id"))
+public class Auction extends BaseEntity {
 
     @OneToOne
     @JoinColumn(name = "car_id", nullable = false, unique = true)
     private Car car;
 
-    @Column(name = "start_price", nullable = false)
+    @Column(name = "start_price", precision = 10, scale = 2, nullable = false)
     private BigDecimal startPrice;
 
-    @Column(name = "current_price")
+    @Column(name = "current_price", precision = 10, scale = 2)
     private BigDecimal currentPrice;
 
     @Column(name = "start_time", nullable = false)
@@ -43,16 +30,10 @@ public class Auction {
     @Column(nullable = false)
     private AuctionStatus status;
 
-    // ===== getters and setters =====
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bid> bids;
 
-    public Long getAuctionId() {
-        return auctionId;
-    }
-
-    public void setAuctionId(Long auctionId) {
-        this.auctionId = auctionId;
-    }
-
+    // getters & setters
     public Car getCar() {
         return car;
     }
@@ -99,5 +80,13 @@ public class Auction {
 
     public void setStatus(AuctionStatus status) {
         this.status = status;
+    }
+
+    public List<Bid> getBids() {
+        return bids;
+    }
+
+    public void setBids(List<Bid> bids) {
+        this.bids = bids;
     }
 }

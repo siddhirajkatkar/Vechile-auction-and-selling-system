@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "../../services/axios";
 
 const MySubscription = () => {
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMySubscription();
@@ -22,33 +25,97 @@ const MySubscription = () => {
   };
 
   if (loading) {
-    return <h2 style={{ textAlign: "center" }}>Loading subscription...</h2>;
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <h4>Loading subscription...</h4>
+      </div>
+    );
   }
 
   if (error) {
-    return <h2 style={{ color: "red", textAlign: "center" }}>{error}</h2>;
+    return (
+      <div className="container text-center mt-5">
+        <h4 className="text-danger">{error}</h4>
+        <button
+          className="btn btn-primary mt-3"
+          onClick={() => navigate("/user/dashboard")}
+        >
+          Go to Dashboard
+        </button>
+      </div>
+    );
   }
 
   if (!subscription) {
-    return <p style={{ textAlign: "center" }}>No active subscription</p>;
+    return (
+      <div className="container text-center mt-5">
+        <h5>No active subscription</h5>
+        <button
+          className="btn btn-outline-primary mt-3"
+          onClick={() => navigate("/user/subscriptions")}
+        >
+          View Plans
+        </button>
+      </div>
+    );
   }
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h1>My Subscription</h1>
+  const isActive = subscription.status === "ACTIVE";
 
-      <div style={{ border: "1px solid #ccc", padding: "15px", width: "400px" }}>
-        <p><b>Plan:</b> {subscription.plan?.planName}</p>
-        <p><b>Status:</b> {subscription.status}</p>
-        <p>
-          <b>Start Date:</b>{" "}
-          {new Date(subscription.startDate).toLocaleString()}
-        </p>
-        <p>
-          <b>End Date:</b>{" "}
-          {new Date(subscription.endDate).toLocaleString()}
-        </p>
-        <p><b>Bids Left:</b> {subscription.bidsRemaining}</p>
+  return (
+    <div className="container mt-5">
+      <h2 className="mb-4 text-center">My Subscription</h2>
+
+      <div className="card shadow-sm mx-auto" style={{ maxWidth: "420px" }}>
+        <div className="card-body">
+          <p>
+            <strong>Plan:</strong> {subscription.plan?.planName}
+          </p>
+
+          <p>
+            <strong>Status:</strong>{" "}
+            <span
+              className={`badge ${
+                isActive ? "bg-success" : "bg-danger"
+              }`}
+            >
+              {subscription.status}
+            </span>
+          </p>
+
+          <p>
+            <strong>Start Date:</strong>{" "}
+            {new Date(subscription.startDate).toLocaleString()}
+          </p>
+
+          <p>
+            <strong>End Date:</strong>{" "}
+            {new Date(subscription.endDate).toLocaleString()}
+          </p>
+
+          <p>
+            <strong>Bids Remaining:</strong>{" "}
+            <span className="fw-bold">{subscription.bidsRemaining}</span>
+          </p>
+
+          <div className="d-flex justify-content-between mt-4">
+            <button
+              className="btn btn-secondary"
+              onClick={() => navigate("/user/dashboard")}
+            >
+              Dashboard
+            </button>
+
+            {!isActive && (
+              <button
+                className="btn btn-primary"
+                onClick={() => navigate("/user/subscriptions")}
+              >
+                Renew Plan
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -26,17 +26,20 @@ public class CarServiceImpl implements CarService {
     @Autowired
     private UserRepository userRepo;
 
+    // ================= ADD NEW CAR =================
+
     @Override
     public Car addNewCar(CarDto carDto, MultipartFile[] images, Long sellerId) {
+
         Car car = new Car();
         car.setRegistrationNo(carDto.getRegistrationNo());
         car.setBrand(carDto.getBrand());
-        car.setManufacturer(carDto.getManufacturer());  // ✅ FIX
+        car.setManufacturer(carDto.getManufacturer());
         car.setModel(carDto.getModel());
         car.setManufactureYear(carDto.getManufactureYear());
         car.setFuelType(carDto.getFuelType());
         car.setTransmission(carDto.getTransmission());
-        car.setKmDriven(carDto.getKmDriven());          // ✅ FIX
+        car.setKmDriven(carDto.getKmDriven());
         car.setSaleType(carDto.getSaleType());
         car.setMileage(carDto.getMileage());
         car.setEngineCc(carDto.getEngineCc());
@@ -45,15 +48,20 @@ public class CarServiceImpl implements CarService {
         car.setDescription(carDto.getDescription());
         car.setStatus(Status.PENDING_APPROVAL);
 
-        car.setSeller(userRepo.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found")));
+        car.setSeller(
+                userRepo.findById(sellerId)
+                        .orElseThrow(() -> new RuntimeException("Seller not found"))
+        );
 
         return carRepo.save(car);
     }
 
+    // ================= ADMIN =================
+
     @Override
     public List<CarResponseDTO> getPendingCars() {
-        return carRepo.findByStatus(Status.PENDING_APPROVAL).stream()
+        return carRepo.findByStatus(Status.PENDING_APPROVAL)
+                .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -74,25 +82,32 @@ public class CarServiceImpl implements CarService {
         return carRepo.save(car);
     }
 
+    // ================= USER / BUYER =================
+
     @Override
     public List<CarResponseDTO> getAllAvailableCars() {
-        return carRepo.findByStatus(Status.AVAILABLE).stream()
+        return carRepo.findByStatus(Status.AVAILABLE)
+                .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<CarResponseDTO> getAllCars() {
-        return carRepo.findAll().stream()
+        return carRepo.findAll()
+                .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
+    // ================= ENTITY → DTO MAPPER =================
+
     /**
-     * Helper method to convert Car Entity to CarResponseDTO.
-     * This ensures all Lazy-loaded fields are accessed within the transaction.
+     * Converts Car entity into CarResponseDTO.
+     * Safe for JSON serialization (no lazy loading issues).
      */
     private CarResponseDTO convertToDto(Car car) {
+
         CarResponseDTO dto = new CarResponseDTO();
         dto.setId(car.getId());
         dto.setRegistrationNo(car.getRegistrationNo());
@@ -103,13 +118,19 @@ public class CarServiceImpl implements CarService {
         dto.setStatus(car.getStatus().name());
 
         if (car.getSeller() != null) {
-            dto.setSellerName(car.getSeller().getFirstName() + " " + car.getSeller().getLastName());
+            dto.setSellerName(
+                    car.getSeller().getFirstName() + " " +
+                    car.getSeller().getLastName()
+            );
         }
 
         if (car.getImages() != null) {
-            dto.setImageUrls(car.getImages().stream()
-                    .map(img -> img.getImageUrl())
-                    .collect(Collectors.toList()));
+            dto.setImageUrls(
+                    car.getImages()
+                            .stream()
+                            .map(img -> img.getImageUrl())
+                            .collect(Collectors.toList())
+            );
         }
 
         return dto;

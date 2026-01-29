@@ -11,4 +11,6 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     // Fetch all active auctions
     List<Auction> findByStatus(AuctionStatus status);
+    boolean existsByCarIdAndStatus(Long carId, AuctionStatus status);
+
 }
