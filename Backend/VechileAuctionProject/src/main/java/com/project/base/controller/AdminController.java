@@ -3,52 +3,65 @@ package com.project.base.controller;
 import com.project.base.dto.ApiResponse;
 import com.project.base.dto.CarResponseDTO;
 import com.project.base.services.CarService;
+import com.project.base.services.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RestController
-@RequestMapping("/api/admin")
-@PreAuthorize("hasAuthority('ROLE_ADMIN')") // ✅ Class-level security for all admin routes
+@RequestMapping("/admin") // Matches your React axiosConfig base/paths
+@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+@CrossOrigin(origins = "http://localhost:3000") // Allows React to connect
 public class AdminController {
 
     @Autowired
     private CarService carService;
+    
+    @Autowired
+    private UserService userService;
+
+    // --- USER MANAGEMENT (Matches your React ManageUsers.js) ---
 
     /**
-     * Fetch all cars that are currently waiting for admin approval.
+     * Matches axios.get("/admin/users")
      */
-    @GetMapping("/cars/pending")
-    public ResponseEntity<List<CarResponseDTO>> getPendingCars() {
-        List<CarResponseDTO> pendingCars = carService.getPendingCars();
-        return ResponseEntity.ok(pendingCars);
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     /**
-     * Approve a car listing to make it visible in the marketplace (Status: AVAILABLE).
+     * Matches axios.put(`/admin/users/${userId}/make-admin`)
      */
-    @PutMapping("/cars/approve/{id}")
+    @PutMapping("/users/{userId}/make-admin")
+    public ResponseEntity<ApiResponse> promoteToAdmin(@PathVariable Long userId) {
+        userService.promoteToAdmin(userId);
+        return ResponseEntity.ok(new ApiResponse("User promoted to Admin successfully."));
+    }
+
+    // --- VEHICLE MANAGEMENT (Matches your AdminDashboard.js) ---
+
+    @GetMapping("/vehicles/pending")
+    public ResponseEntity<List<CarResponseDTO>> getPendingCars() {
+        return ResponseEntity.ok(carService.getPendingCars());
+    }
+
+    @PutMapping("/vehicles/approve/{id}")
     public ResponseEntity<ApiResponse> approveCar(@PathVariable Long id) {
         carService.approveCar(id);
-        return ResponseEntity.ok(new ApiResponse("Car approved successfully. It is now live on the marketplace."));
+        return ResponseEntity.ok(new ApiResponse("Car approved successfully."));
     }
 
-    /**
-     * Reject a car listing (Status: CANCELLED).
-     */
-    @PutMapping("/cars/reject/{id}")
+    @PutMapping("/vehicles/reject/{id}")
     public ResponseEntity<ApiResponse> rejectCar(@PathVariable Long id) {
         carService.rejectCar(id);
-        return ResponseEntity.ok(new ApiResponse("Car rejected. Status has been set to CANCELLED."));
+        return ResponseEntity.ok(new ApiResponse("Car rejected."));
     }
 
-    /**
-     * View every car in the database regardless of status.
-     */
-    @GetMapping("/cars/all")
+    @GetMapping("/vehicles/all")
     public ResponseEntity<List<CarResponseDTO>> getAllCars() {
         return ResponseEntity.ok(carService.getAllCars());
     }

@@ -8,12 +8,14 @@ import com.project.base.pojo.User;
 import com.project.base.pojo.UserStatus;
 
 public interface UserService {
-
+    // ... existing methods
     String registerUser(UserDTO userDto) throws ApiException;
-
     User getCurrentUser(); 
     List<User> getAllUsers();
-    void updateUserStatus(Long userId, UserStatus status); // Active/InActive
+    void updateUserStatus(Long userId, UserStatus status);
+
+    // ✅ ADD THIS
+    void promoteToAdmin(Long userId); 
 }
     // ✅ ADD THIS
 

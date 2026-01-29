@@ -34,7 +34,7 @@ const AdminDashboard = () => {
         <p>Monitor ongoing auctions</p>
         <button
           className="btn btn-primary"
-          onClick={() => navigate("/admin/auctions")}
+          onClick={() => navigate("/user/auctions")}
         >
           View
         </button>

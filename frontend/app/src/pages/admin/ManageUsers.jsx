@@ -14,6 +14,7 @@ const ManageUsers = () => {
     try {
       setLoading(true);
       const res = await getAllUsers();
+      // Ensure we handle different possible ID field names (id or userId)
       setUsers(res.data || []);
       setError("");
     } catch (err) {
@@ -25,65 +26,61 @@ const ManageUsers = () => {
   };
 
   const promoteUser = async (id) => {
+    if (!id) return alert("Invalid User ID");
     try {
       await makeAdmin(id);
-      loadUsers();
+      loadUsers(); // Refresh list
     } catch (err) {
       alert("Failed to promote user");
     }
   };
 
+  // Helper: Checks if any role in the Set is ROLE_ADMIN
+  const checkIsAdmin = (u) => {
+    return u.roles && u.roles.some(r => r.roleName === "ROLE_ADMIN");
+  };
+
   return (
     <div className="container mt-4">
       <h3>Manage Users</h3>
+      {loading && <p className="text-muted">Loading...</p>}
+      {!loading && error && <p className="text-danger">{error}</p>}
 
-      {/* Loading state */}
-      {loading && (
-        <p className="text-muted mt-3">Loading users...</p>
-      )}
-
-      {/* Error state */}
-      {!loading && error && (
-        <p className="text-danger mt-3">{error}</p>
-      )}
-
-      {/* No users */}
-      {!loading && !error && users.length === 0 && (
-        <p className="text-muted mt-3">
-          No users available to manage.
-        </p>
-      )}
-
-      {/* Users table */}
-      {!loading && !error && users.length > 0 && (
+      {!loading && !error && (
         <table className="table mt-3">
           <thead>
             <tr>
               <th>Email</th>
-              <th>Role</th>
+              <th>Roles</th>
               <th>Action</th>
             </tr>
           </thead>
-
           <tbody>
-            {users.map((u) => (
-              <tr key={u.userId}>
-                <td>{u.email}</td>
-                <td>{u.role}</td>
-                <td>
-                  {u.role !== "ROLE_ADMIN" ? (
-                    <button
-                      className="btn btn-sm btn-primary"
-                      onClick={() => promoteUser(u.userId)}
-                    >
-                      Make Admin
-                    </button>
-                  ) : (
-                    <span className="text-success">Admin</span>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {users.map((u) => {
+              // FIX: Ensure we extract the correct ID property
+              const userId = u.userId || u.id; 
+              
+              return (
+                <tr key={userId}>
+                  <td>{u.email}</td>
+                  <td>
+                    {u.roles?.map(r => r.roleName.replace("ROLE_", "")).join(", ")}
+                  </td>
+                  <td>
+                    {!checkIsAdmin(u) ? (
+                      <button 
+                        className="btn btn-sm btn-primary" 
+                        onClick={() => promoteUser(userId)}
+                      >
+                        Make Admin
+                      </button>
+                    ) : (
+                      <span className="text-success fw-bold">Admin</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}

@@ -25,7 +25,7 @@ public class AuctionController {
     // ================= BUYER =================
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_BUYER','ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_BUYER','ROLE_SELLER','ROLE_ADMIN')")
     public ResponseEntity<List<AuctionResponseDTO>> viewAuctions() {
 
         Long userId = userService.getCurrentUser().getId();
