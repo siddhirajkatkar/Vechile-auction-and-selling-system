@@ -8,6 +8,6 @@ import com.project.base.pojo.Car;
 import com.project.base.pojo.Status;
 
 public interface CarRepository extends JpaRepository<Car, Long> {
-
+	List<Car>  findBySellerId(Long sellerId);
     List<Car> findByStatus(Status status);
 }

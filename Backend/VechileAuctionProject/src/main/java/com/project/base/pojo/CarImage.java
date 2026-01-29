@@ -1,5 +1,7 @@
 package com.project.base.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -25,5 +27,6 @@ public class CarImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "car_id", nullable = false)
+    @JsonIgnore
     private Car car;
 }

@@ -1,0 +1,37 @@
+package com.project.base.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.project.base.dto.CarDto;
+import com.project.base.dto.CarResponseDTO;
+import com.project.base.services.UserCarService;
+import com.project.base.services.UserService;
+
+@RestController
+@RequestMapping("/api/cars")
+public class UserCarController {
+
+    @Autowired
+    private UserCarService userCarService;
+
+    @Autowired
+    private UserService userService;
+
+    // =========================
+    // Get cars listed by the current seller
+    // =========================
+    @GetMapping("/mine")
+//    @PreAuthorize("hasRole('SELLER')") // Only sellers can access
+    public ResponseEntity<List<CarResponseDTO>> getMyCars() {
+        Long sellerId = userService.getCurrentUser().getId();
+        List<CarResponseDTO> cars = userCarService.getCarsBySeller(sellerId);
+        return ResponseEntity.ok(cars);
+    }
+}
