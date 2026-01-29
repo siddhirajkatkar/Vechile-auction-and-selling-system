@@ -35,7 +35,7 @@ public class CarController {
         value = "/add",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> addCar(
             @RequestPart("carData") String carDataJson,
             @RequestPart(value = "images", required = false) MultipartFile[] images
