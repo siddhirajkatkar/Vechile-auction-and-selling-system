@@ -105,6 +105,26 @@ public class CartServiceImpl implements CartService {
 
         return new CartResponseDTO(cars, totalAmount);
     }
+    	
+    
+    @Override
+    public ApiResponse removeFromCart(Long cartItemId, String email) {
+    	 User user = userRepo.findByEmail(email)
+    	            .orElseThrow(() -> new RuntimeException("User not found"));
 
+    	    Cart cart = cartRepo.findByUser(user)
+    	            .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+    	    boolean removed = cart.getItems().removeIf(item -> item.getId().equals(cartItemId));
+
+    	    if (!removed) {
+    	        throw new RuntimeException("Cart item not found");
+    	    }
+
+    	    cartRepo.save(cart);
+        return new ApiResponse("Item Removed From Cart");
+    }
+  
+    
 
 }

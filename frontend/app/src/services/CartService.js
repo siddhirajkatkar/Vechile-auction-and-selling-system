@@ -7,13 +7,23 @@ export const getMyCart = async () => {
 };
 
 // Remove item from cart
+// export const removeFromCart = async (cartItemId) => {
+//   const res = await axiosInstance.delete(`/api/cart/remove/${cartItemId}`);
+//   return res.data;
+// };
+
 export const removeFromCart = async (cartItemId) => {
-  const res = await axiosInstance.delete(`/api/cart/remove/${cartItemId}`);
-  return res.data;
+  return await axiosInstance.delete(`/api/cart/remove/${cartItemId}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  });
 };
+
 
 // Add car to cart
 export const addToCart = async (carId) => {
   const res = await axiosInstance.post(`/api/cart/add/${carId}`);
   return res.data;
 };
+

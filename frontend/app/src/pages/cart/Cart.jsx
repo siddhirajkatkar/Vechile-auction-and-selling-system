@@ -3,10 +3,12 @@ import React, { useEffect, useState } from "react";
 import { getMyCart, removeFromCart } from "../../services/CartService";
 import CartItem from "./CartItem";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const [cart, setCart] = useState({ cars: [], totalAmount: 0 });
   const [loading, setLoading] = useState(true);
+  const navigate=useNavigate();
 
   const fetchCart = async () => {
     setLoading(true);
@@ -54,7 +56,7 @@ const Cart = () => {
           <h4>Total Amount:</h4>
           <h4 className="text-success">₹{cart.totalAmount.toLocaleString()}</h4>
         </div>
-        <button className="btn btn-success btn-lg w-100 mt-3">
+        <button className="btn btn-success btn-lg w-100 mt-3" onClick={()=>{navigate("/user/payment")}}>
           <i className="bi bi-cart-check-fill me-2"></i> Proceed to Checkout
         </button>
       </div>

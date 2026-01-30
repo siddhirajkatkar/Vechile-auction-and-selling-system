@@ -27,6 +27,7 @@ import AdminDashboard from "./pages/admin/AdminDashBoard";
 import ManageUsers from "./pages/admin/ManageUsers";
 import ManageVehicles from "./pages/admin/ManageVechiles";
 import ViewAuctions from "./pages/admin/ViewAuctions";
+import PaymentPage from "./pages/payment/paymentPage";
 
 function App() {
   return (
@@ -51,6 +52,10 @@ function App() {
       {/* cart */}
 
       <Route path="/user/cart" element={<Cart/>}/>
+
+      {/* Payment */}
+
+      <Route path="/user/payment" element={<PaymentPage/>}/>
 
       {/* Admin */}
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
