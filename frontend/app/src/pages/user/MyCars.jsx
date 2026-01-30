@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../services/axios";
+import CarDetailsModal from "./CarDetailsModal";
 
 const statusBadge = {
   DRAFT: "bg-secondary bg-opacity-10 text-secondary",
   PENDING_APPROVAL: "bg-warning bg-opacity-10 text-dark",
   AVAILABLE: "bg-success bg-opacity-10 text-success",
   UNDER_AUCTION: "bg-primary bg-opacity-10 text-primary",
+  AUCTION_COMPLETED: "bg-info bg-opacity-10 text-info",
   SOLD: "bg-dark text-white",
   CANCELLED: "bg-danger bg-opacity-10 text-danger",
 };
@@ -16,12 +18,11 @@ const MyCars = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [auctionLoadingId, setAuctionLoadingId] = useState(null);
+  const [selectedCar, setSelectedCar] = useState(null);
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchMyCars();
-  }, []);
+  useEffect(() => { fetchMyCars(); }, []);
 
   const fetchMyCars = async () => {
     try {
@@ -39,11 +40,12 @@ const MyCars = () => {
     try {
       setAuctionLoadingId(carId);
       await axiosInstance.post(`/api/auctions/start/${carId}`);
-      setCars(prev => prev.map(car => car.id === carId ? { ...car, status: "UNDER_AUCTION" } : car));
-      setMessage("✅ Auction started! Redirecting...");
-      setTimeout(() => navigate("/user/auctions"), 1500);
-    } catch (err) {
-      setMessage(err.response?.data?.message || "❌ Auction failed");
+      setCars(prev => prev.map(car =>
+        car.id === carId ? { ...car, status: "UNDER_AUCTION" } : car
+      ));
+      setMessage("✅ Auction started!");
+    } catch {
+      setMessage("❌ Auction failed");
     } finally {
       setAuctionLoadingId(null);
     }
@@ -60,118 +62,107 @@ const MyCars = () => {
     }
   };
 
-  if (loading) return (
-    <div className="min-vh-100 d-flex justify-content-center align-items-center">
-      <div className="spinner-border text-primary shadow-sm" role="status" />
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="min-vh-100 d-flex justify-content-center align-items-center">
+        <div className="spinner-border text-primary shadow-sm" role="status" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-vh-100 pb-5" style={{ backgroundColor: "#fcfcfd" }}>
-      {/* Bootstrap Icons */}
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net" />
-
-      {/* HEADER SECTION */}
       <div className="bg-white border-bottom py-4 mb-5 shadow-sm">
         <div className="container d-flex justify-content-between align-items-center">
-          <div>
-            <button className="btn btn-link text-decoration-none text-muted p-0 mb-1" onClick={() => navigate("/user/dashboard")}>
-              <i className="bi bi-arrow-left me-1"></i> Dashboard
-            </button>
-            <h3 className="fw-bold mb-0">My <span className="text-primary">Garage</span></h3>
-          </div>
+          <h3 className="fw-bold mb-0">My <span className="text-primary">Garage</span></h3>
           <button className="btn btn-primary rounded-pill px-4" onClick={() => navigate("/user/add-car")}>
-            <i className="bi bi-plus-lg me-2"></i> List New Car
+            List New Car
           </button>
         </div>
       </div>
 
       <div className="container">
-        {message && (
-          <div className="alert alert-dark border-0 shadow-sm rounded-3 text-center mb-4 py-2">
-            {message}
-          </div>
-        )}
+        {message && <div className="alert alert-dark text-center">{message}</div>}
 
-        {cars.length === 0 ? (
-          <div className="text-center py-5 bg-white rounded-4 shadow-sm">
-            <i className="bi bi-emoji-smile text-muted" style={{ fontSize: "3rem" }}></i>
-            <h4 className="mt-3">Your garage is empty</h4>
-            <p className="text-muted">Turn your car into cash today!</p>
-            <button className="btn btn-primary rounded-pill mt-2" onClick={() => navigate("/user/add-car")}>List a Car</button>
-          </div>
-        ) : (
-          <div className="row g-4">
-            {cars.map((car) => (
-              <div className="col-lg-4 col-md-6" key={car.id}>
-                <div className="card h-100 border-0 shadow-sm garage-card">
-                  <div className="position-relative">
-                    {car.images?.length > 0 ? (
-                      <img
-                        src={`http://localhost:8080${car.images[0].imageUrl}`}
-                        className="card-img-top"
-                        style={{ height: "210px", objectFit: "cover" }}
-                        alt={car.brand}
-                      />
-                    ) : (
-                      <div className="bg-light text-center py-5" style={{ height: "210px" }}>No Image</div>
+        <div className="row g-4">
+          {cars.map((car) => (
+            <div className="col-lg-4 col-md-6" key={car.id}>
+              <div
+                className="card car-card h-100 border-0 shadow-sm"
+                onClick={() => setSelectedCar(car)}
+              >
+                <div className="position-relative">
+                  <img
+                    src={`http://localhost:8080${car.images?.[0]?.imageUrl}`}
+                    className="card-img-top"
+                    style={{ height: "220px", objectFit: "cover" }}
+                    alt=""
+                  />
+                  <span className={`status-pill ${statusBadge[car.status]}`}>
+                    {car.status.replace("_", " ")}
+                  </span>
+                </div>
+
+                <div className="card-body p-4">
+                  <h5 className="fw-bold">{car.brand} {car.model}</h5>
+                  <p className="text-muted small">{car.manufactureYear} • {car.fuelType}</p>
+                  <h4 className="text-primary fw-bold mb-3">₹{car.price?.toLocaleString()}</h4>
+
+                  <div className="d-flex gap-2">
+                    {car.status === "DRAFT" && (
+                      <button className="btn btn-outline-dark btn-sm w-100"
+                        onClick={(e)=>{e.stopPropagation(); navigate(`/user/edit-car/${car.id}`);}}>
+                        Edit
+                      </button>
                     )}
-                    <span className={`status-pill position-absolute top-0 end-0 m-3 ${statusBadge[car.status]}`}>
-                      {car.status.replace("_", " ")}
-                    </span>
-                  </div>
 
-                  <div className="card-body p-4">
-                    <h5 className="fw-bold mb-1">{car.brand} {car.model}</h5>
-                    <p className="text-muted small mb-3">{car.manufactureYear} • {car.fuelType}</p>
-                    
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                      <span className="text-primary fw-bold fs-5">₹{car.price?.toLocaleString()}</span>
-                    </div>
-
-                    <div className="d-flex gap-2">
-                      <button className="btn btn-light flex-grow-1 rounded-3 fw-bold btn-sm" onClick={() => navigate(`/cars/${car.id}`)}>
-                        View
+                    {car.status === "AVAILABLE" && (
+                      <button className="btn btn-success btn-sm w-100"
+                        disabled={auctionLoadingId === car.id}
+                        onClick={(e)=>{e.stopPropagation(); startAuction(car.id);}}>
+                        Auction
                       </button>
-                      
-                      {car.status === "DRAFT" && (
-                        <button className="btn btn-outline-secondary flex-grow-1 rounded-3 btn-sm" onClick={() => navigate(`/user/edit-car/${car.id}`)}>
-                          Edit
-                        </button>
-                      )}
+                    )}
 
-                      {car.status === "AVAILABLE" && (
-                        <button 
-                          className="btn btn-success flex-grow-1 rounded-3 btn-sm fw-bold shadow-sm" 
-                          disabled={auctionLoadingId === car.id}
-                          onClick={() => startAuction(car.id)}
-                        >
-                          {auctionLoadingId === car.id ? "..." : "Auction"}
-                        </button>
-                      )}
-
-                      <button 
-                        className="btn btn-outline-danger btn-sm border-0" 
-                        disabled={car.status === "UNDER_AUCTION" || car.status === "SOLD"}
-                        onClick={() => handleDelete(car.id)}
-                      >
-                        <i className="bi bi-trash3"></i>
-                      </button>
-                    </div>
+                    <button
+                      className="btn btn-outline-danger btn-sm w-100"
+                      disabled={["UNDER_AUCTION","AUCTION_COMPLETED","SOLD"].includes(car.status)}
+                      onClick={(e)=>{e.stopPropagation(); handleDelete(car.id);}}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
       </div>
 
+      <CarDetailsModal car={selectedCar} onClose={() => setSelectedCar(null)} />
+
       <style>{`
-        .garage-card { border-radius: 20px; overflow: hidden; transition: all 0.3s ease; }
-        .garage-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.08) !important; }
-        .status-pill { padding: 4px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-light { background: #f1f3f5; color: #495057; }
-        .btn-light:hover { background: #e9ecef; }
+        .car-card {
+          border-radius: 20px;
+          overflow: hidden;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .car-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+        }
+        .status-pill {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          padding: 6px 14px;
+          border-radius: 8px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          background: rgba(255,255,255,0.9);
+          backdrop-filter: blur(6px);
+        }
       `}</style>
     </div>
   );

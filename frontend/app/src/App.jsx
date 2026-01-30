@@ -17,6 +17,11 @@ import ViewAuction from "./pages/user/ViewAuction";
 
 import CarsForSale from "./pages/user/CarForSale";
 
+// Cart
+
+import Cart from "./pages/cart/Cart";
+
+
 /* Admin Pages */
 import AdminDashboard from "./pages/admin/AdminDashBoard";
 import ManageUsers from "./pages/admin/ManageUsers";
@@ -42,6 +47,10 @@ function App() {
       <Route path="/user/my-subscription" element={<MySubscription />} />
       <Route path="/user/my-cars" element={<MyCars />} />
       <Route path="/user/car-for-sell" element={<CarsForSale/>}/>
+
+      {/* cart */}
+
+      <Route path="/user/cart" element={<Cart/>}/>
 
       {/* Admin */}
       <Route path="/admin/dashboard" element={<AdminDashboard />} />

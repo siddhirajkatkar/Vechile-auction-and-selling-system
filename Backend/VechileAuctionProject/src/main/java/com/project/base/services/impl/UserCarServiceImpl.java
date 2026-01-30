@@ -12,6 +12,7 @@ import com.project.base.dto.CarDto;
 import com.project.base.dto.CarResponseDTO;
 import com.project.base.pojo.Car;
 import com.project.base.pojo.CarImage;
+import com.project.base.pojo.User;
 import com.project.base.repository.CarRepository;
 import com.project.base.repository.UserRepository;
 import com.project.base.services.ImageStorageService;
@@ -65,6 +66,13 @@ public class UserCarServiceImpl implements UserCarService{
 	            // Images
 
 	            dto.setImages(car.getImages());
+	            
+	            User seller = car.getSeller();
+	            if (seller != null) {
+	                dto.setSellerName(seller.getFirstName()+" "+seller.getLastName());// change if field name different
+	                dto.setSellerEmail(seller.getEmail());
+	                dto.setSellerPhone(seller.getPhone());
+	            }
 
 	            return dto;
 	        }).collect(Collectors.toList());
