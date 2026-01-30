@@ -1,7 +1,7 @@
 import axiosInstance from "./axios";
 
-// Base path must match backend controller
-const BASE_URL = "/api/cars";
+// ✅ Must match AdminController
+const BASE_URL = "/admin/vehicles";
 
 // ================= ADMIN VEHICLE APIs =================
 

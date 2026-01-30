@@ -22,7 +22,9 @@ const MyCars = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => { fetchMyCars(); }, []);
+  useEffect(() => {
+    fetchMyCars();
+  }, []);
 
   const fetchMyCars = async () => {
     try {
@@ -35,14 +37,42 @@ const MyCars = () => {
     }
   };
 
+  // ✅ SUBMIT FOR APPROVAL
+  const submitForApproval = async (carId) => {
+    if (!window.confirm("Submit this car for admin approval?")) return;
+
+    try {
+      await axiosInstance.put(`/api/cars/submit/${carId}`);
+
+      setCars(prev =>
+        prev.map(car =>
+          car.id === carId
+            ? { ...car, status: "PENDING_APPROVAL" }
+            : car
+        )
+      );
+
+      setMessage("✅ Car submitted for approval");
+    } catch {
+      setMessage("❌ Submission failed");
+    }
+  };
+
   const startAuction = async (carId) => {
     if (!window.confirm("Start auction for this car?")) return;
+
     try {
       setAuctionLoadingId(carId);
       await axiosInstance.post(`/api/auctions/start/${carId}`);
-      setCars(prev => prev.map(car =>
-        car.id === carId ? { ...car, status: "UNDER_AUCTION" } : car
-      ));
+
+      setCars(prev =>
+        prev.map(car =>
+          car.id === carId
+            ? { ...car, status: "UNDER_AUCTION" }
+            : car
+        )
+      );
+
       setMessage("✅ Auction started!");
     } catch {
       setMessage("❌ Auction failed");
@@ -53,6 +83,7 @@ const MyCars = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this car listing?")) return;
+
     try {
       await axiosInstance.delete(`/api/cars/${id}`);
       setCars(prev => prev.filter(c => c.id !== id));
@@ -65,7 +96,7 @@ const MyCars = () => {
   if (loading) {
     return (
       <div className="min-vh-100 d-flex justify-content-center align-items-center">
-        <div className="spinner-border text-primary shadow-sm" role="status" />
+        <div className="spinner-border text-primary" />
       </div>
     );
   }
@@ -74,15 +105,22 @@ const MyCars = () => {
     <div className="min-vh-100 pb-5" style={{ backgroundColor: "#fcfcfd" }}>
       <div className="bg-white border-bottom py-4 mb-5 shadow-sm">
         <div className="container d-flex justify-content-between align-items-center">
-          <h3 className="fw-bold mb-0">My <span className="text-primary">Garage</span></h3>
-          <button className="btn btn-primary rounded-pill px-4" onClick={() => navigate("/user/add-car")}>
+          <h3 className="fw-bold mb-0">
+            My <span className="text-primary">Garage</span>
+          </h3>
+          <button
+            className="btn btn-primary rounded-pill px-4"
+            onClick={() => navigate("/user/add-car")}
+          >
             List New Car
           </button>
         </div>
       </div>
 
       <div className="container">
-        {message && <div className="alert alert-dark text-center">{message}</div>}
+        {message && (
+          <div className="alert alert-dark text-center">{message}</div>
+        )}
 
         <div className="row g-4">
           {cars.map((car) => (
@@ -105,29 +143,66 @@ const MyCars = () => {
 
                 <div className="card-body p-4">
                   <h5 className="fw-bold">{car.brand} {car.model}</h5>
-                  <p className="text-muted small">{car.manufactureYear} • {car.fuelType}</p>
-                  <h4 className="text-primary fw-bold mb-3">₹{car.price?.toLocaleString()}</h4>
+                  <p className="text-muted small">
+                    {car.manufactureYear} • {car.fuelType}
+                  </p>
+                  <h4 className="text-primary fw-bold mb-3">
+                    ₹{car.price?.toLocaleString()}
+                  </h4>
 
                   <div className="d-flex gap-2">
+                    {/* EDIT */}
                     {car.status === "DRAFT" && (
-                      <button className="btn btn-outline-dark btn-sm w-100"
-                        onClick={(e)=>{e.stopPropagation(); navigate(`/user/edit-car/${car.id}`);}}>
+                      <button
+                        className="btn btn-outline-dark btn-sm w-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/user/edit-car/${car.id}`);
+                        }}
+                      >
                         Edit
                       </button>
                     )}
 
+                    {/* SUBMIT FOR APPROVAL */}
+                    {car.status === "DRAFT" && (
+                      <button
+                        className="btn btn-warning btn-sm w-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          submitForApproval(car.id);
+                        }}
+                      >
+                        Submit
+                      </button>
+                    )}
+
+                    {/* AUCTION */}
                     {car.status === "AVAILABLE" && (
-                      <button className="btn btn-success btn-sm w-100"
+                      <button
+                        className="btn btn-success btn-sm w-100"
                         disabled={auctionLoadingId === car.id}
-                        onClick={(e)=>{e.stopPropagation(); startAuction(car.id);}}>
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          startAuction(car.id);
+                        }}
+                      >
                         Auction
                       </button>
                     )}
 
+                    {/* DELETE */}
                     <button
                       className="btn btn-outline-danger btn-sm w-100"
-                      disabled={["UNDER_AUCTION","AUCTION_COMPLETED","SOLD"].includes(car.status)}
-                      onClick={(e)=>{e.stopPropagation(); handleDelete(car.id);}}
+                      disabled={[
+                        "UNDER_AUCTION",
+                        "AUCTION_COMPLETED",
+                        "SOLD"
+                      ].includes(car.status)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(car.id);
+                      }}
                     >
                       Delete
                     </button>
@@ -139,31 +214,10 @@ const MyCars = () => {
         </div>
       </div>
 
-      <CarDetailsModal car={selectedCar} onClose={() => setSelectedCar(null)} />
-
-      <style>{`
-        .car-card {
-          border-radius: 20px;
-          overflow: hidden;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-        .car-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
-        }
-        .status-pill {
-          position: absolute;
-          top: 15px;
-          right: 15px;
-          padding: 6px 14px;
-          border-radius: 8px;
-          font-size: 0.7rem;
-          font-weight: 700;
-          background: rgba(255,255,255,0.9);
-          backdrop-filter: blur(6px);
-        }
-      `}</style>
+      <CarDetailsModal
+        car={selectedCar}
+        onClose={() => setSelectedCar(null)}
+      />
     </div>
   );
 };

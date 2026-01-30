@@ -11,10 +11,6 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 @Configuration
 public class SecurityConfigration {
-
-
-
-
     @Bean
     //method level annotation - to declare a method returning java object
 		public ModelMapper modelMapper()
@@ -28,7 +24,4 @@ public class SecurityConfigration {
 			return map;//Method rets configured ModelMapper bean to SC
 		}
 }
-//}
-//
-//
-//
+

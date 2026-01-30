@@ -10,4 +10,6 @@ import com.project.base.pojo.RoleName;
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
     Optional<Role> findByRoleName(RoleName roleName);
+
+    
 }

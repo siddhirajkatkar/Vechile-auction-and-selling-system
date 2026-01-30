@@ -8,9 +8,9 @@ export const addCar = async (car, images) => {
 
   const formData = new FormData();
 
-  // 🔥 car MUST be sent as JSON Blob
+  // ✅ MUST match backend: @RequestPart("carData")
   formData.append(
-    "car",
+    "carData",
     new Blob([JSON.stringify(car)], {
       type: "application/json"
     })
@@ -23,14 +23,13 @@ export const addCar = async (car, images) => {
     });
   }
 
-  // 🔐 SEND TOKEN HERE
   return axios.post(
-    `${API_BASE_URL}/user/cars/add`,
+    `${API_BASE_URL}/api/cars/add`,
     formData,
     {
       headers: {
         Authorization: `Bearer ${token}`
-        // ❌ DO NOT set Content-Type manually
+        // ❌ Do NOT set Content-Type manually
       }
     }
   );

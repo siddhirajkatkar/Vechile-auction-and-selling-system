@@ -26,7 +26,7 @@ const Login = () => {
 
       // Redirect based on role
       if (data.role === "ROLE_ADMIN") {
-        navigate("/admin/dashboard");
+        navigate("/admin-ui/dashboard");
       } else {
         navigate("/user/dashboard");
       }

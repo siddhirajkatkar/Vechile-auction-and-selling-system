@@ -1,44 +1,37 @@
 import { Routes, Route } from "react-router-dom";
 
-/* Public Pages */
+/* ================= PUBLIC PAGES ================= */
 import Home from "./pages/public/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 
-/* User Pages */
+/* ================= USER PAGES ================= */
 import UserDashboard from "./pages/user/UserDashBoard";
-import Auctions from "./pages/user/auctions";
+import Auctions from "./pages/user/Auctions";
+import ViewAuction from "./pages/user/ViewAuction";
 import MyBids from "./pages/user/MyBids";
-import AddCar from "./pages/user/addCar";
+import AddCar from "./pages/user/AddCar";
 import SubscriptionPlans from "./pages/user/SubscriptionPlans";
 import MySubscription from "./pages/user/MySubscription";
 import MyCars from "./pages/user/MyCars";
-import ViewAuction from "./pages/user/ViewAuction";
-
 import CarsForSale from "./pages/user/CarForSale";
 
-// Cart
-
-import Cart from "./pages/cart/Cart";
-
-
-/* Admin Pages */
+/* ================= ADMIN PAGES (UI ROUTES) ================= */
 import AdminDashboard from "./pages/admin/AdminDashBoard";
 import ManageUsers from "./pages/admin/ManageUsers";
 import ManageVehicles from "./pages/admin/ManageVechiles";
 import ViewAuctions from "./pages/admin/ViewAuctions";
-import PaymentPage from "./pages/payment/paymentPage";
 
 function App() {
   return (
     <Routes>
 
-      {/* Public */}
+      {/* ===== PUBLIC ===== */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* User */}
+      {/* ===== USER ===== */}
       <Route path="/user/dashboard" element={<UserDashboard />} />
       <Route path="/user/auctions" element={<Auctions />} />
       <Route path="/user/auction/:auctionId" element={<ViewAuction />} />
@@ -47,24 +40,16 @@ function App() {
       <Route path="/user/subscriptions" element={<SubscriptionPlans />} />
       <Route path="/user/my-subscription" element={<MySubscription />} />
       <Route path="/user/my-cars" element={<MyCars />} />
-      <Route path="/user/car-for-sell" element={<CarsForSale/>}/>
+      <Route path="/user/car-for-sell" element={<CarsForSale />} />
 
-      {/* cart */}
-
-      <Route path="/user/cart" element={<Cart/>}/>
-
-      {/* Payment */}
-
-      <Route path="/user/payment" element={<PaymentPage/>}/>
-
-      {/* Admin */}
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/users" element={<ManageUsers />} />
-      <Route path="/admin/vehicles" element={<ManageVehicles />} />
-      <Route path="/admin/auctions" element={<ViewAuctions />} />
+      {/* ===== ADMIN UI (IMPORTANT: NOT /admin/*) ===== */}
+      <Route path="/admin-ui/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin-ui/users" element={<ManageUsers />} />
+      <Route path="/admin-ui/vehicles" element={<ManageVehicles />} />
+      <Route path="/admin-ui/auctions" element={<ViewAuctions />} />
 
     </Routes>
   );
-}
+} 
 
 export default App;

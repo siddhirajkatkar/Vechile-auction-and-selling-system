@@ -4,9 +4,12 @@ import com.project.base.dto.CarDto;
 import com.project.base.dto.CarResponseDTO;
 import com.project.base.pojo.Car;
 import com.project.base.pojo.CarImage;
+import com.project.base.pojo.Role;
+import com.project.base.pojo.RoleName;
 import com.project.base.pojo.Status;
 import com.project.base.pojo.User;
 import com.project.base.repository.CarRepository;
+import com.project.base.repository.RoleRepository;
 import com.project.base.repository.UserRepository;
 import com.project.base.repository.CarImageRepository;
 import com.project.base.services.CarService;
@@ -31,6 +34,7 @@ public class CarServiceImpl implements CarService {
     private final CarImageRepository carImageRepository;
     private final UserRepository userRepo;
     private final ImageStorageService imageStorageService;
+    private final RoleRepository roleRepository;
 
     // ================= SELLER =================
 
@@ -39,6 +43,21 @@ public class CarServiceImpl implements CarService {
      */
     @Override
     public Car addNewCar(CarDto carDto, MultipartFile[] images, Long sellerId) {
+
+        User user = userRepo.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // ✅ ADD SELLER ROLE IF NOT PRESENT
+        boolean isSeller = user.getRoles().stream()
+                .anyMatch(role -> role.getRoleName() == RoleName.ROLE_SELLER);
+
+        if (!isSeller) {
+            Role sellerRole = roleRepository.findByRoleName(RoleName.ROLE_SELLER)
+                    .orElseThrow(() -> new RuntimeException("ROLE_SELLER not found"));
+
+            user.getRoles().add(sellerRole);
+            userRepo.save(user);
+        }
 
         Car car = new Car();
         car.setRegistrationNo(carDto.getRegistrationNo());
@@ -56,21 +75,14 @@ public class CarServiceImpl implements CarService {
         car.setColor(carDto.getColor());
         car.setDescription(carDto.getDescription());
 
-        // ✅ Correct status
         car.setStatus(Status.DRAFT);
-
-        car.setSeller(
-                userRepo.findById(sellerId)
-                        .orElseThrow(() -> new RuntimeException("Seller not found"))
-        );
+        car.setSeller(user);
 
         Car savedCar = carRepo.save(car);
 
-        // Save images
         if (images != null && images.length > 0) {
             try {
                 List<String> imageUrls = imageStorageService.storeImages(images);
-
                 for (String url : imageUrls) {
                     CarImage carImage = new CarImage();
                     carImage.setCar(savedCar);
@@ -84,6 +96,9 @@ public class CarServiceImpl implements CarService {
 
         return savedCar;
     }
+
+
+
 
     /**
      * Seller submits car for admin approval
