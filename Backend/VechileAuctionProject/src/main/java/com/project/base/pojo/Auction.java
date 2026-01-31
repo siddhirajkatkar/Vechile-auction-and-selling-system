@@ -89,4 +89,17 @@ public class Auction extends BaseEntity {
     public void setBids(List<Bid> bids) {
         this.bids = bids;
     }
+    
+    @ManyToOne
+    @JoinColumn(name = "winner_id")
+    private User winner;
+
+    public User getWinner() {
+        return winner;
+    }
+
+    public void setWinner(User winner) {
+        this.winner = winner;
+    }
+
 }

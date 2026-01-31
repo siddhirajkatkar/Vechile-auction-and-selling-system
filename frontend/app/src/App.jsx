@@ -22,6 +22,9 @@ import ManageUsers from "./pages/admin/ManageUsers";
 import ManageVehicles from "./pages/admin/ManageVechiles";
 import ViewAuctions from "./pages/admin/ViewAuctions";
 
+import WonAuctions from "./pages/user/WonAuctions";
+import AdminAuctions from "./pages/admin/AdminAuctions";
+
 function App() {
   return (
     <Routes>
@@ -47,6 +50,10 @@ function App() {
       <Route path="/admin-ui/users" element={<ManageUsers />} />
       <Route path="/admin-ui/vehicles" element={<ManageVehicles />} />
       <Route path="/admin-ui/auctions" element={<ViewAuctions />} />
+
+      <Route path="/user/won-auctions" element={<WonAuctions />} />
+      <Route path="/admin/auctions" element={<AdminAuctions />}/>
+
 
     </Routes>
   );
