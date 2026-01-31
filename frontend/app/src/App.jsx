@@ -10,7 +10,7 @@ import UserDashboard from "./pages/user/UserDashBoard";
 import Auctions from "./pages/user/Auctions";
 import ViewAuction from "./pages/user/ViewAuction";
 import MyBids from "./pages/user/MyBids";
-import AddCar from "./pages/user/AddCar";
+import AddCar from "./pages/user/addCar";
 import SubscriptionPlans from "./pages/user/SubscriptionPlans";
 import MySubscription from "./pages/user/MySubscription";
 import MyCars from "./pages/user/MyCars";
