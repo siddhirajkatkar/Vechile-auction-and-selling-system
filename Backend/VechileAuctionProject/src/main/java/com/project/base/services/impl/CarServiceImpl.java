@@ -6,6 +6,7 @@ import com.project.base.pojo.Car;
 import com.project.base.pojo.CarImage;
 import com.project.base.pojo.Role;
 import com.project.base.pojo.RoleName;
+import com.project.base.pojo.SaleType;
 import com.project.base.pojo.Status;
 import com.project.base.pojo.User;
 import com.project.base.repository.CarRepository;
@@ -163,7 +164,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<CarResponseDTO> getAllAvailableCars() {
-        return carRepo.findByStatus(Status.AVAILABLE)
+        return carRepo.findBySaleTypeAndStatus(SaleType.DIRECT, Status.AVAILABLE)
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());

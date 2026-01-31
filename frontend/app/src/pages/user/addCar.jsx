@@ -17,7 +17,10 @@ const AddCar = () => {
     kmDriven: "",
     color: "",
     price: "",
-    saleType: "DIRECT"
+    saleType: "DIRECT",
+    engineCc: "",
+    mileage: "",
+    description: ""
   });
 
   const [images, setImages] = useState([]);
@@ -40,9 +43,8 @@ const AddCar = () => {
         manufactureYear: parseInt(car.manufactureYear),
         kmDriven: parseInt(car.kmDriven),
         price: parseFloat(car.price),
-        mileage: null,
-        engineCc: null,
-        description: ""
+        engineCc: car.engineCc ? parseInt(car.engineCc) : null,
+        mileage: car.mileage ? parseFloat(car.mileage) : null,
       };
 
       const formData = new FormData();
@@ -67,10 +69,6 @@ const AddCar = () => {
 
   return (
     <div className="min-vh-100 pb-5" style={{ backgroundColor: "#f8f9fa" }}>
-      {/* Bootstrap Icons */}
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net" />
-
-      {/* HEADER SECTION */}
       <div className="bg-white border-bottom py-4 mb-5 shadow-sm">
         <div className="container d-flex justify-content-between align-items-center">
           <div>
@@ -89,30 +87,30 @@ const AddCar = () => {
             <div className="card border-0 shadow-lg p-3 p-md-4" style={{ borderRadius: "20px" }}>
               <form onSubmit={submitCar}>
                 
-                {/* SECTION 1: BASIC INFO */}
+                {/* VEHICLE IDENTIFICATION */}
                 <div className="mb-5">
                   <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Vehicle Identification</h5>
                   <div className="row g-3">
                     <div className="col-md-6">
                       <label className="form-label small fw-bold">Registration Number</label>
-                      <input type="text" name="registrationNo" placeholder="e.g. MH12AB1234" className="form-control custom-input" onChange={handleChange} required />
+                      <input type="text" name="registrationNo" className="form-control custom-input" onChange={handleChange} required />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label small fw-bold">Brand Name</label>
-                      <input type="text" name="brand" placeholder="e.g. Toyota" className="form-control custom-input" onChange={handleChange} required />
+                      <input type="text" name="brand" className="form-control custom-input" onChange={handleChange} required />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label small fw-bold">Manufacturer</label>
-                      <input type="text" name="manufacturer" placeholder="e.g. Toyota Kirloskar" className="form-control custom-input" onChange={handleChange} required />
+                      <input type="text" name="manufacturer" className="form-control custom-input" onChange={handleChange} required />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label small fw-bold">Model</label>
-                      <input type="text" name="model" placeholder="e.g. Fortuner" className="form-control custom-input" onChange={handleChange} required />
+                      <input type="text" name="model" className="form-control custom-input" onChange={handleChange} required />
                     </div>
                   </div>
                 </div>
 
-                {/* SECTION 2: SPECIFICATIONS */}
+                {/* TECHNICAL SPECIFICATIONS */}
                 <div className="mb-5">
                   <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Technical Specifications</h5>
                   <div className="row g-3">
@@ -138,10 +136,20 @@ const AddCar = () => {
                         <option value="AUTOMATIC">Automatic</option>
                       </select>
                     </div>
+
+                    <div className="col-md-4">
+                      <label className="form-label small fw-bold">Engine Capacity (CC)</label>
+                      <input type="number" name="engineCc" className="form-control custom-input" onChange={handleChange} />
+                    </div>
+
+                    <div className="col-md-4">
+                      <label className="form-label small fw-bold">Mileage</label>
+                      <input type="number" step="0.1" name="mileage" className="form-control custom-input" onChange={handleChange} />
+                    </div>
                   </div>
                 </div>
 
-                {/* SECTION 3: CONDITION & PRICING */}
+                {/* CONDITION & PRICING */}
                 <div className="mb-5">
                   <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Condition & Pricing</h5>
                   <div className="row g-3">
@@ -171,11 +179,24 @@ const AddCar = () => {
                   </div>
                 </div>
 
+                {/* DESCRIPTION */}
+                <div className="mb-5">
+                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Vehicle Description</h5>
+                  <textarea
+                    name="description"
+                    rows="4"
+                    placeholder="Add extra details about condition, features, modifications, etc."
+                    className="form-control custom-input"
+                    onChange={handleChange}
+                  />
+                </div>
+
                 <div className="d-grid mt-4">
                   <button type="submit" disabled={loading} className="btn btn-primary btn-lg rounded-pill shadow fw-bold py-3">
                     {loading ? "Processing..." : <><i className="bi bi-cloud-arrow-up me-2"></i> Publish Vehicle</>}
                   </button>
                 </div>
+
               </form>
             </div>
           </div>

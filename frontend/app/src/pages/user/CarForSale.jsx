@@ -13,6 +13,7 @@ const CarsForSale = () => {
   const fetchCars = async () => {
     try {
       const res = await axiosInstance.get("/api/cars");
+      console.log(res.data);
       const cleanedCars = (Array.isArray(res.data) ? res.data : []).map(car => ({
         ...car,
         images: (car.images || []).map(img => ({ id: img.id, imageUrl: img.imageUrl }))

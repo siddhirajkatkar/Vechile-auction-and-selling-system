@@ -80,7 +80,7 @@ public class CarController {
      */
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<CarResponseDTO>> getAvailableCars() {
+    public ResponseEntity<?> getAvailableCars() {
         return ResponseEntity.ok(carService.getAllAvailableCars());
     }
 }

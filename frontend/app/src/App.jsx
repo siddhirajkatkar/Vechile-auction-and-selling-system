@@ -24,6 +24,8 @@ import ViewAuctions from "./pages/admin/ViewAuctions";
 
 import WonAuctions from "./pages/user/WonAuctions";
 import AdminAuctions from "./pages/admin/AdminAuctions";
+import Cart from "./pages/cart/Cart";
+import PaymentPage from "./pages/payment/paymentPage";
 
 function App() {
   return (
@@ -44,6 +46,14 @@ function App() {
       <Route path="/user/my-subscription" element={<MySubscription />} />
       <Route path="/user/my-cars" element={<MyCars />} />
       <Route path="/user/car-for-sell" element={<CarsForSale />} />
+
+      {/* Cart */}
+
+      <Route path="/user/cart" element={<Cart/>}/>
+
+      {/* Payment */}
+
+      <Route path="/user/payment" element={<PaymentPage/>}/>
 
       {/* ===== ADMIN UI (IMPORTANT: NOT /admin/*) ===== */}
       <Route path="/admin-ui/dashboard" element={<AdminDashboard />} />

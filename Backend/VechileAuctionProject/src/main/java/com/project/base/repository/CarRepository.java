@@ -10,7 +10,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 import com.project.base.pojo.Car;
+import com.project.base.pojo.SaleType;
 import com.project.base.pojo.Status;
+import com.project.base.pojo.User;
 
 import jakarta.persistence.LockModeType;
 
@@ -20,6 +22,8 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT c FROM Car c WHERE c.id = :carId")
     Optional<Car> findByIdForUpdate(@Param("carId") Long carId);
+    List<Car> findBySaleType(SaleType saleType);
+    List<Car> findBySaleTypeAndStatus(SaleType saleType, Status status);
   
     
 
