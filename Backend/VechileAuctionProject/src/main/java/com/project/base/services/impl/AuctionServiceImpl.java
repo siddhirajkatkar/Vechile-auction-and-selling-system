@@ -70,9 +70,9 @@ public class AuctionServiceImpl implements AuctionService {
             throw new RuntimeException("You are not the owner of this car");
         }
 
-        if (car.getStatus() != Status.AVAILABLE) {
-            throw new RuntimeException("Car must be approved before auction");
-        }
+//        if (car.getStatus() != Status.AVAILABLE) {
+//            throw new RuntimeException("Car must be approved before auction");
+//        }
 
         if (car.getAuctionAttempts() >= 3) {
             throw new RuntimeException("Maximum auction attempts reached");
@@ -89,9 +89,9 @@ public class AuctionServiceImpl implements AuctionService {
             }
         }
 
-        if (auctionRepo.existsByCarIdAndStatus(carId, AuctionStatus.ACTIVE)) {
-            throw new RuntimeException("Active auction already exists");
-        }
+//        if (auctionRepo.existsByCarIdAndStatus(carId, AuctionStatus.ACTIVE)) {
+//            throw new RuntimeException("Active auction already exists");
+//        }
 
         Auction auction = new Auction();
         auction.setCar(car);
