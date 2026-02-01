@@ -1,6 +1,7 @@
 package com.project.base.services.impl;
 
 import com.project.base.dto.UserDTO;
+import com.project.base.exception.ApiException;
 import com.project.base.pojo.Role;
 import com.project.base.pojo.RoleName;
 import com.project.base.pojo.User;
@@ -62,6 +63,16 @@ public class UserServiceImpl implements UserService {
         user.getRoles().add(adminRole);
 
         // 4. Save
+        userRepository.save(user);
+    }
+
+    @Override
+    public void resetPassword(String email, String newPassword) throws ApiException {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApiException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
 

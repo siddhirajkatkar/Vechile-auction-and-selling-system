@@ -116,4 +116,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     		""")
     		List<Auction> findWonAuctionsByUser(@Param("user") User user);
 
+	long countByAuctionAndBidder(Auction auction, User buyer);
+
 }

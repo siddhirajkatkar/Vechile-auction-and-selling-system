@@ -17,6 +17,7 @@ const ViewAuction = () => {
   useEffect(() => {
     fetchAuction();
     fetchBidHistory();
+
     const interval = setInterval(fetchBidHistory, 10000);
     return () => clearInterval(interval);
   }, [auctionId]);
@@ -26,7 +27,7 @@ const ViewAuction = () => {
       const res = await axiosInstance.get(`/api/auctions/${auctionId}`);
       setAuction(res.data);
     } catch {
-      setMessage("❌ Failed to load auction");
+      setMessage("❌ Failed to load auction details.");
     } finally {
       setLoading(false);
     }
@@ -41,11 +42,12 @@ const ViewAuction = () => {
     }
   };
 
-  // ⏳ Countdown (works automatically for 10 mins)
+  // ⏳ Remaining time
   const remainingTime = (endTime) => {
     if (!endTime) return "N/A";
     const diff = new Date(endTime) - new Date();
     if (diff <= 0) return "Auction Ended";
+
     const mins = Math.floor(diff / 60000);
     const secs = Math.floor((diff % 60000) / 1000);
     return `${mins}m ${secs}s remaining`;
@@ -60,16 +62,17 @@ const ViewAuction = () => {
     });
   };
 
+  // 🔥 FINAL BID LOGIC WITH MEANINGFUL ERRORS
   const placeBid = async (customAmount = null) => {
     if (auction.status !== "ACTIVE") {
-      alert("Auction has ended");
+      setMessage("❌ This auction has already ended.");
       return;
     }
 
-    const amountToBid = customAmount || bidAmount;
+    const amountToBid = Number(customAmount || bidAmount);
 
     if (!amountToBid || amountToBid <= auction.currentPrice) {
-      alert("Bid must be higher than current price!");
+      setMessage("❌ Bid must be higher than the current price.");
       return;
     }
 
@@ -77,14 +80,34 @@ const ViewAuction = () => {
       await axiosInstance.post(`/api/bids/place/${auctionId}`, {
         bidAmount: amountToBid,
       });
+
       setMessage("✅ Bid placed successfully!");
       setBidAmount("");
       fetchAuction();
       fetchBidHistory();
+
       setTimeout(() => setMessage(""), 3000);
+
     } catch (err) {
-      setMessage(err.response?.data?.message || "❌ Bid failed");
-    }
+  let backendMessage = "Bid failed. Please try again.";
+
+  if (typeof err.response?.data === "string") {
+    backendMessage = err.response.data;
+  } else if (err.response?.data?.message) {
+    backendMessage = err.response.data.message;
+  }
+
+  setMessage(`❌ ${backendMessage}`);
+
+  // Optional redirect for subscription-related issues
+  if (
+    backendMessage.toLowerCase().includes("subscription") ||
+    backendMessage.toLowerCase().includes("bids")
+  ) {
+    setTimeout(() => navigate("/user/subscriptions"), 2000);
+  }
+}
+
   };
 
   if (loading) {
@@ -99,6 +122,7 @@ const ViewAuction = () => {
 
   return (
     <div className="min-vh-100 pb-5 bg-light">
+
       {/* HEADER */}
       <nav className="navbar navbar-dark bg-dark px-4 py-3 sticky-top">
         <button
@@ -107,7 +131,11 @@ const ViewAuction = () => {
         >
           ← Dashboard
         </button>
-        <span className="navbar-brand ms-3 fw-bold">Live Auction Room</span>
+
+        <span className="navbar-brand ms-3 fw-bold">
+          Live Auction Room
+        </span>
+
         <span
           className={`badge ${
             auction.status === "ACTIVE" ? "bg-danger" : "bg-secondary"
@@ -120,7 +148,9 @@ const ViewAuction = () => {
       <div className="container mt-4">
 
         {message && (
-          <div className="alert alert-info text-center">{message}</div>
+          <div className="alert alert-info text-center">
+            {message}
+          </div>
         )}
 
         {/* AUCTION CARD */}
@@ -130,7 +160,9 @@ const ViewAuction = () => {
               {auction.brand} {auction.model}
             </h2>
 
-            <p className="text-muted">{remainingTime(auction.endTime)}</p>
+            <p className="text-muted">
+              {remainingTime(auction.endTime)}
+            </p>
 
             <h1 className="text-primary fw-bold">
               ₹{auction.currentPrice?.toLocaleString()}
@@ -139,7 +171,8 @@ const ViewAuction = () => {
             {/* 🏆 WINNER */}
             {auction.status === "COMPLETED" && auction.winnerName && (
               <div className="alert alert-success mt-4 rounded-4">
-                🏆 <strong>{auction.winnerName}</strong> won this auction <br />
+                🏆 <strong>{auction.winnerName}</strong> won this auction
+                <br />
                 Final Price: ₹{auction.finalPrice?.toLocaleString()}
               </div>
             )}
@@ -157,7 +190,7 @@ const ViewAuction = () => {
                 </button>
               )}
 
-            {/* 🔨 BIDDING – ONLY WHILE ACTIVE */}
+            {/* 🔨 BIDDING */}
             {auction.status === "ACTIVE" && (
               <div className="mt-4">
                 <button
@@ -188,7 +221,10 @@ const ViewAuction = () => {
 
         {/* BID HISTORY */}
         <div className="card shadow-sm rounded-4">
-          <div className="card-header fw-bold">Bid Activity</div>
+          <div className="card-header fw-bold">
+            Bid Activity
+          </div>
+
           <div className="list-group list-group-flush">
             {bids.length === 0 ? (
               <div className="p-4 text-muted text-center">
@@ -204,7 +240,9 @@ const ViewAuction = () => {
                         {formatBidTime(b.bidTime)}
                       </div>
                     </div>
-                    <strong>₹{b.bidAmount.toLocaleString()}</strong>
+                    <strong>
+                      ₹{b.bidAmount.toLocaleString()}
+                    </strong>
                   </div>
                 </div>
               ))

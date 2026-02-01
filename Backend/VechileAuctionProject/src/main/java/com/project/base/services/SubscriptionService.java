@@ -9,5 +9,9 @@ public interface SubscriptionService {
 
     UserSubscription getActiveSubscription(Long userId);
     
+    void buyPlan(PlanName planName, Long userId);
+
+    
+    
     
 }

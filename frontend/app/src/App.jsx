@@ -26,6 +26,7 @@ import WonAuctions from "./pages/user/WonAuctions";
 import AdminAuctions from "./pages/admin/AdminAuctions";
 import Cart from "./pages/cart/Cart";
 import PaymentPage from "./pages/payment/paymentPage";
+import ResetPassword from "./pages/auth/ResetPasssword";
 
 function App() {
   return (
@@ -35,6 +36,8 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
 
       {/* ===== USER ===== */}
       <Route path="/user/dashboard" element={<UserDashboard />} />

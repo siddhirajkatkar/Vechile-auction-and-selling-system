@@ -89,6 +89,15 @@ const Login = () => {
             <button className="btn btn-primary w-100" type="submit">
               Login
             </button>
+            <div className="text-end mb-3">
+  <span
+    className="text-primary"
+    style={{ cursor: "pointer", fontSize: "14px" }}
+    onClick={() => navigate("/reset-password")}
+  >
+    Forgot Password?
+  </span>
+</div>
 
             {/* Register Link */}
             <div className="text-center mt-3">

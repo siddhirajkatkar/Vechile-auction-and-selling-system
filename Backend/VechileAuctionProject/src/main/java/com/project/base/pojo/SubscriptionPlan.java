@@ -26,4 +26,11 @@ public class SubscriptionPlan {
 
     @Column(name = "bids_per_auction")
     private int bidsPerAuction;
+
+	public long getValidityDays() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	@Column(name = "validity_days", nullable = false)
+    private int validityDays;
 }

@@ -30,7 +30,7 @@ public class BidController {
 
     // ================= PLACE BID =================
     @PostMapping("/place/{auctionId}")
-    @PreAuthorize("hasAuthority('ROLE_BUYER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_BUYER','ROLE_SELLER')")
     public ResponseEntity<ApiResponse> placeBid(
             @PathVariable Long auctionId,
             @RequestBody BidRequest request

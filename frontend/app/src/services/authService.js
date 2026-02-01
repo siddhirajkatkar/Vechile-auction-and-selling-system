@@ -17,6 +17,19 @@ export const login = async (email, password) => {
   return response.data;
 };
 
+export const resetPassword = async (email, newPassword) => {
+  const response = await axios.post(
+    `${API_URL}/reset-password`,
+    null,
+    {
+      params: {
+        email,
+        newPassword,
+      },
+    }
+  );
+  return response.data;
+};
 // REGISTER (THIS MATCHES BACKEND)
 export const register = async (userData) => {
   return axios.post(`${API_BASE_URL}/api/auth/register`, userData);

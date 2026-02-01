@@ -32,4 +32,8 @@ public class GlobalExceptionHandler {
                 .status(500)
                 .body(Map.of("error", "Internal server error"));
     }
+    @ExceptionHandler(BidException.class)
+    public ResponseEntity<String> handleBidException(BidException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }

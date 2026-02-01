@@ -5,6 +5,7 @@ import com.project.base.pojo.*;
 import com.project.base.repository.*;
 import com.project.base.security.JwtUtil;
 import com.project.base.security.MyUserDetails;
+import com.project.base.services.UserService;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class AuthController {
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private JwtUtil jwtUtil;
     @Autowired private RoleRepository roleRepository;
+    @Autowired private UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequestDto request) {
@@ -87,7 +89,14 @@ public class AuthController {
                 .body(new ApiResponse("Authentication failed: " + e.getMessage()));
         }
     }
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+            @RequestParam String email,
+            @RequestParam String newPassword) {
 
+        userService.resetPassword(email, newPassword);
+        return ResponseEntity.ok(new ApiResponse("Password updated successfully"));
+    }
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
 

@@ -4,7 +4,11 @@ import com.project.base.pojo.SubscriptionStatus;
 import com.project.base.pojo.User;
 import com.project.base.pojo.UserSubscription;
 
+import jakarta.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +27,17 @@ public interface UserSubscriptionRepository
             User user,
             SubscriptionStatus status
     );
+    @Modifying
+    @Transactional
+    @Query("""
+        UPDATE UserSubscription us
+        SET us.status = :expired
+        WHERE us.user.id = :userId
+          AND us.status = :active
+    """)
+    void deactivateActiveSubscriptions(Long userId,
+                                       SubscriptionStatus active,
+                                       SubscriptionStatus expired);
+
+
 }
