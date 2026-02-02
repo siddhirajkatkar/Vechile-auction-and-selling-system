@@ -7,10 +7,8 @@ import java.util.List;
 
 public interface SubscriptionPlanService {
 
-    // View all available plans (View Plan page)
     List<SubscriptionPlan> getAllPlans();
 
-    // Fetch a plan by name (used while buying)
     SubscriptionPlan getPlanByName(PlanName planName);
 }
 	

@@ -17,9 +17,7 @@ public interface UserService {
 
     void updateUserStatus(Long userId, UserStatus status);
 
-    // Promote user role
     void promoteToAdmin(Long userId);
 
-    // ✅ Reset password (college-level)
     void resetPassword(String email, String newPassword) throws ApiException;
 }
