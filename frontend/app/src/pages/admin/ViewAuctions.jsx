@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../../services/axios";
 
 const ViewAuction = () => {
   const { auctionId } = useParams();
+  const navigate = useNavigate();
+
   const [auction, setAuction] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const username = "Admin"; // replace with dynamic value if needed
 
   useEffect(() => {
     loadAuction();
@@ -43,11 +47,25 @@ const ViewAuction = () => {
   }
 
   return (
-    <div className="container my-5">
+    <div className="container my-4">
+
+      {/* TOP BAR */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <button
+          className="btn btn-primary fw-semibold"
+          onClick={() => navigate("/admin/dashboard")}
+        >
+          ← Back to Dashboard
+        </button>
+
+        <span className="badge bg-dark px-3 py-2">
+          Username: <strong>{username}</strong>
+        </span>
+      </div>
 
       {/* 🔥 HEADER */}
       <div
-        className="p-4 rounded-4 mb-4 text-white"
+        className="p-4 rounded-4 mb-4 text-white shadow"
         style={{
           background: "linear-gradient(135deg, #ff512f, #dd2476)",
         }}
@@ -78,7 +96,7 @@ const ViewAuction = () => {
           <div
             className="p-4 rounded-4 h-100"
             style={{
-              background: "rgba(255,255,255,0.9)",
+              background: "rgba(255,255,255,0.95)",
               boxShadow: "0 15px 35px rgba(0,0,0,0.15)",
             }}
           >
@@ -135,6 +153,7 @@ const ViewAuction = () => {
           </div>
         </div>
       </div>
+
     </div>
   );
 };
