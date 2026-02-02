@@ -94,7 +94,9 @@ public class CartServiceImpl implements CartService {
                             car.getImages(), // full CarImage entities
                             seller.getFirstName(),
                             seller.getEmail(),
-                            seller.getPhone()
+                            seller.getPhone(),
+                            item.getId()
+                            
                     );
                 })
                 .toList();
@@ -102,6 +104,7 @@ public class CartServiceImpl implements CartService {
         double totalAmount = cart.getItems().stream()
                 .mapToDouble(CartItem::getPriceAtAddTime)
                 .sum();
+        
 
         return new CartResponseDTO(cars, totalAmount);
     }

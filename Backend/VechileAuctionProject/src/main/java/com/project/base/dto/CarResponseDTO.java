@@ -47,6 +47,8 @@ public class CarResponseDTO {
 	    private String sellerEmail;
 	    private String sellerPhone;
 	    
+	    private Long cartItemId;        // <-- ADD THIS to track the CartItem
+
 
 }
 

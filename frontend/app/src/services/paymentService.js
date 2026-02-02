@@ -1,4 +1,4 @@
-import axios from "./axios";
+import axios from "../services/axios";
 
 // create Razorpay order
 export const createOrder = async (amount) => {
