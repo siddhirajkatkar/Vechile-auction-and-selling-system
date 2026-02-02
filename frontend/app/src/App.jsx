@@ -40,7 +40,6 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-
       {/* ===== USER ===== */}
       <Route path="/user/dashboard" element={<UserDashboard />} />
       <Route path="/user/auctions" element={<Auctions />} />
@@ -51,31 +50,31 @@ function App() {
       <Route path="/user/my-subscription" element={<MySubscription />} />
       <Route path="/user/my-cars" element={<MyCars />} />
       <Route path="/user/car-for-sell" element={<CarsForSale />} />
-      <Route path="/user/my-orders" element={<MyOrdersPage/>} />
+      <Route path="/user/my-orders" element={<MyOrdersPage />} />
 
-      {/* Cart */}
+      {/* ===== CART ===== */}
+      <Route path="/user/cart" element={<Cart />} />
 
-      <Route path="/user/cart" element={<Cart/>}/>
+      {/* ===== PAYMENT FLOW (DO NOT REMOVE) ===== */}
+      {/* Optional direct access (cart / testing) */}
+      <Route path="/user/payment" element={<PaymentPage />} />
 
-      {/* Payment */}
+      {/* Auction-based checkout */}
+      <Route path="/user/payment/:auctionId" element={<Checkout />} />
 
-      <Route path="/user/payment" element={<PaymentPage/>}/>
+      {/* ===== WON AUCTIONS ===== */}
+      <Route path="/user/won-auctions" element={<WonAuctions />} />
 
-      {/* ===== ADMIN UI (IMPORTANT: NOT /admin/*) ===== */}
+      {/* ===== ADMIN UI ===== */}
       <Route path="/admin-ui/dashboard" element={<AdminDashboard />} />
       <Route path="/admin-ui/users" element={<ManageUsers />} />
       <Route path="/admin-ui/vehicles" element={<ManageVehicles />} />
       <Route path="/admin-ui/auctions" element={<ViewAuctions />} />
 
-      <Route path="/user/won-auctions" element={<WonAuctions />} />
-      <Route path="/admin/auctions" element={<AdminAuctions />}/>
-
-      <Route path="/user/payment/:auctionId" element={<Checkout />} />
-
-
+      <Route path="/admin/auctions" element={<AdminAuctions />} />
 
     </Routes>
   );
-} 
+}
 
 export default App;
