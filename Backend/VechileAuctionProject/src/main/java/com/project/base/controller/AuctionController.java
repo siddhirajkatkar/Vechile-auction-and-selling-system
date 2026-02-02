@@ -85,5 +85,13 @@ public class AuctionController {
                 auctionService.getAllAuctionsForAdmin()
         );
     }
+    @PostMapping("/pay/{auctionId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_BUYER','ROLE_SELLER')")
+    public ResponseEntity<?> payAuction(@PathVariable Long auctionId) {
+
+        auctionService.markAsPaid(auctionId);
+
+        return ResponseEntity.ok("Payment successful");
+    }
 
 }

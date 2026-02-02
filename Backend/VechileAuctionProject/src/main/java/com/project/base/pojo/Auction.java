@@ -10,10 +10,23 @@ import java.util.List;
 @AttributeOverride(name = "id", column = @Column(name = "auction_id"))
 public class Auction extends BaseEntity {
 
+    // =========================
+    // RELATIONSHIPS
+    // =========================
     @OneToOne
     @JoinColumn(name = "car_id", nullable = false, unique = true)
     private Car car;
 
+    @ManyToOne
+    @JoinColumn(name = "winner_id")
+    private User winner;
+
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bid> bids;
+
+    // =========================
+    // AUCTION DETAILS
+    // =========================
     @Column(name = "start_price", precision = 10, scale = 2, nullable = false)
     private BigDecimal startPrice;
 
@@ -30,8 +43,7 @@ public class Auction extends BaseEntity {
     @Column(nullable = false)
     private AuctionStatus status;
 
-    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Bid> bids;
+  
     
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
@@ -46,12 +58,40 @@ public class Auction extends BaseEntity {
 	}
 
 	// getters & setters
+    // =========================
+    // PAYMENT TRACKING
+    // =========================
+    @Column(nullable = false)
+    private boolean paid = false;
+
+    @Column(name = "payment_time")
+    private LocalDateTime paymentTime;
+
+    // =========================
+    // GETTERS & SETTERS
+    // =========================
     public Car getCar() {
         return car;
     }
 
     public void setCar(Car car) {
         this.car = car;
+    }
+
+    public User getWinner() {
+        return winner;
+    }
+
+    public void setWinner(User winner) {
+        this.winner = winner;
+    }
+
+    public List<Bid> getBids() {
+        return bids;
+    }
+
+    public void setBids(List<Bid> bids) {
+        this.bids = bids;
     }
 
     public BigDecimal getStartPrice() {
@@ -94,24 +134,19 @@ public class Auction extends BaseEntity {
         this.status = status;
     }
 
-    public List<Bid> getBids() {
-        return bids;
+    public boolean isPaid() {
+        return paid;
     }
 
-    public void setBids(List<Bid> bids) {
-        this.bids = bids;
-    }
-    
-    @ManyToOne
-    @JoinColumn(name = "winner_id")
-    private User winner;
-
-    public User getWinner() {
-        return winner;
+    public void setPaid(boolean paid) {
+        this.paid = paid;
     }
 
-    public void setWinner(User winner) {
-        this.winner = winner;
+    public LocalDateTime getPaymentTime() {
+        return paymentTime;
     }
 
+    public void setPaymentTime(LocalDateTime paymentTime) {
+        this.paymentTime = paymentTime;
+    }
 }

@@ -16,7 +16,7 @@ const WonAuctions = () => {
       const res = await axiosInstance.get("/api/auctions/my-wins");
       setAuctions(res.data);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to fetch won auctions", err);
     } finally {
       setLoading(false);
     }
@@ -47,18 +47,25 @@ const WonAuctions = () => {
 
              <button
                 className="btn btn-success"
-                onClick={() =>
-                  startPayment({
-                    amount: a.currentPrice,
-                    paymentFor: "AUCTION_WIN",
-                    referenceId: a.auctionId,
-                    title: "Auction Winning Payment",
-                    onSuccess: () => navigate("/user/orders")
-                  })
-                }
+               
               >
                 Make Payment
               </button>
+              {/* 🔥 PAYMENT STATUS HANDLING */}
+              {!a.paid ? (
+                <button
+                  className="btn btn-success"
+                  onClick={() =>
+                    navigate(`/user/payment/${a.auctionId}`)
+                  }
+                >
+                  Make Payment
+                </button>
+              ) : (
+                <span className="badge bg-success fs-6">
+                  Paid ✅
+                </span>
+              )}
             </div>
           </div>
         ))

@@ -8,33 +8,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.project.base.pojo.Auction;
-import com.project.base.pojo.Cart;
-import com.project.base.pojo.Order;
-//import com.project.base.pojo.Order;
-import com.project.base.pojo.OrderItem;
-import com.project.base.pojo.OrderStatus;
-import com.project.base.pojo.Payment;
-import com.project.base.pojo.PaymentFor;
-import com.project.base.pojo.PaymentStatus;
-import com.project.base.pojo.SubscriptionPlan;
-import com.project.base.pojo.SubscriptionStatus;
-import com.project.base.pojo.User;
-import com.project.base.pojo.UserSubscription;
-import com.project.base.repository.AuctionRepository;
-import com.project.base.repository.CartRepository;
-import com.project.base.repository.OrderRepository;
-import com.project.base.repository.PaymentRepository;
-import com.project.base.repository.SubscriptionPlanRepository;
-import com.project.base.repository.UserRepository;
-import com.project.base.repository.UserSubscriptionRepository;
+import com.project.base.pojo.*;
+import com.project.base.repository.*;
 import com.project.base.services.PaymentService;
+import com.project.base.utils.RazorpaySignatureUtil;
 import com.razorpay.RazorpayClient;
-import com.razorpay.Utils;
 
 import lombok.RequiredArgsConstructor;
-
-//import com.razorpay.Order; 
 
 @Service
 @RequiredArgsConstructor
@@ -55,10 +35,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${razorpay.key.secret}")
     private String keySecret;
 
-    // =========================================
-    
-   
-    
+    // ================= CREATE ORDER =================
+    @Override
     public Payment createOrder(Double amount, Long userId,
                                PaymentFor paymentFor, Long referenceId) throws Exception {
 
@@ -71,7 +49,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         com.razorpay.Order razorOrder = client.orders.create(options);
 
-        User user = userRepo.findById(userId).orElseThrow();
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Payment payment = Payment.builder()
                 .razorpayOrderId(razorOrder.get("id"))
@@ -86,38 +65,37 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepo.save(payment);
     }
 
-    // =========================================
+    // ================= VERIFY PAYMENT =================
     @Override
-    public void verifyPayment(String orderId, String paymentId,
-                              String signature, Long userId) throws Exception {
+    public void verifyPayment(String orderId,
+                              String paymentId,
+                              String signature) {
 
-        String payload = orderId + "|" + paymentId;
-        String generatedSignature = Utils.getHash(payload, keySecret);
+        boolean isValid = RazorpaySignatureUtil.verify(orderId, paymentId, signature, keySecret);
 
-        if (!generatedSignature.equals(signature))
-            throw new RuntimeException("Invalid payment signature");
+        if (!isValid) {
+            throw new RuntimeException("Invalid Razorpay signature");
+        }
 
-        Payment payment = paymentRepo.findByRazorpayOrderId(orderId).orElseThrow();
+        Payment payment = paymentRepo.findByRazorpayOrderId(orderId)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        if (payment.getStatus() == PaymentStatus.SUCCESS) return;
 
         payment.setRazorpayPaymentId(paymentId);
         payment.setRazorpaySignature(signature);
         payment.setStatus(PaymentStatus.SUCCESS);
         paymentRepo.save(payment);
 
-        // ROUTER
         switch (payment.getPaymentFor()) {
-
             case CAR_PURCHASE -> handleCarPurchase(payment);
-
             case SUBSCRIPTION -> handleSubscription(payment);
-
             case AUCTION_WIN -> handleAuctionWin(payment);
         }
     }
 
-    // =========================================
+    // ================= HANDLERS =================
     private void handleCarPurchase(Payment payment) {
-
         Cart cart = cartRepo.findByUser(payment.getUser()).orElseThrow();
 
         Order newOrder = Order.builder()
@@ -140,18 +118,12 @@ public class PaymentServiceImpl implements PaymentService {
                 .toList();
 
         savedOrder.setItems(items);
-
-        double total = items.stream().mapToDouble(OrderItem::getPriceAtPurchase).sum();
-        savedOrder.setTotalAmount(total);
-
+        savedOrder.setTotalAmount(items.stream().mapToDouble(OrderItem::getPriceAtPurchase).sum());
         orderRepo.save(savedOrder);
         cart.getItems().clear();
     }
 
-
-    // =========================================
     private void handleSubscription(Payment payment) {
-
         SubscriptionPlan plan = planRepo.findById(payment.getReferenceId()).orElseThrow();
 
         UserSubscription sub = new UserSubscription();
@@ -165,9 +137,7 @@ public class PaymentServiceImpl implements PaymentService {
         userSubRepo.save(sub);
     }
 
-    // =========================================
     private void handleAuctionWin(Payment payment) {
-
         Auction auction = auctionRepo.findById(payment.getReferenceId()).orElseThrow();
         auction.setPaymentStatus(PaymentStatus.SUCCESS);
     }

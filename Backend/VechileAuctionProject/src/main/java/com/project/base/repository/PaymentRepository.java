@@ -8,7 +8,8 @@ import com.project.base.pojo.Payment;
 import com.project.base.pojo.User;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long>{
+    Optional<Payment> findByRazorpayOrderId(String razorpayOrderId);
 
-	Optional<Payment> findByRazorpayOrderId(String orderId);
+
 
 }

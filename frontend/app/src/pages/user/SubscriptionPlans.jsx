@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../services/axios";
-import { createOrder, verifyPayment } from "../../services/paymentService";
 import { startPayment } from "../../util/startPayment";
-
 
 const SubscriptionPlans = () => {
   const [plans, setPlans] = useState([]);
@@ -26,16 +24,16 @@ const SubscriptionPlans = () => {
     }
   };
 
-  // 🔥 FINAL BUY PLAN WITH PAYMENT
- const buyPlan = (plan) => {
-  startPayment({
-    amount: plan.price,
-    paymentFor: "SUBSCRIPTION",
-    referenceId: plan.id,
-    title: plan.planName + " Plan Purchase",
-    onSuccess: () => navigate("/user/my-subscription")
-  });
-};
+  // 🔥 BUY PLAN WITH RAZORPAY
+  const buyPlan = (plan) => {
+    startPayment({
+      amount: plan.price,
+      paymentFor: "SUBSCRIPTION",
+      referenceId: plan.id,
+      title: plan.planName + " Plan Purchase",
+      onSuccess: () => navigate("/user/my-subscription"),
+    });
+  };
 
   if (loading) {
     return (
@@ -50,7 +48,6 @@ const SubscriptionPlans = () => {
 
   return (
     <div className="min-vh-100 pb-5" style={{ backgroundColor: "#f4f7fe" }}>
-      {/* HEADER */}
       <div className="bg-dark text-white py-5 mb-5 shadow">
         <div className="container">
           <button
@@ -70,9 +67,7 @@ const SubscriptionPlans = () => {
 
       <div className="container">
         {error && (
-          <div className="alert alert-danger text-center">
-            {error}
-          </div>
+          <div className="alert alert-danger text-center">{error}</div>
         )}
 
         <div className="row g-4 justify-content-center">
@@ -103,7 +98,7 @@ const SubscriptionPlans = () => {
                       }`}
                       onClick={() => buyPlan(plan)}
                     >
-                      {isPremium ? "Get Pro Access" : "Choose Plan"}
+                      {isPremium ? "Activate Pro Plan" : "Activate Plan"}
                     </button>
                   </div>
                 </div>

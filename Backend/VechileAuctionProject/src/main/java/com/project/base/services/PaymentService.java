@@ -8,6 +8,8 @@ public interface PaymentService {
     Payment createOrder(Double amount, Long userId,
                         PaymentFor paymentFor, Long referenceId) throws Exception;
 
-    void verifyPayment(String orderId, String paymentId,
-                       String signature, Long userId) throws Exception;
+    void verifyPayment(String orderId,
+                       String paymentId,
+                       String signature) ;
 }
+
