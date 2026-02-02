@@ -19,53 +19,48 @@ const PaymentPage = () => {
       setCart(data);
     } catch (err) {
       alert("Failed to load cart");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handlePayment = async () => {
     try {
-      const orderRes = await createOrder(cart.totalAmount);
-      const payment = orderRes;
+      // 1️⃣ Create Razorpay order (JWT REQUIRED)
+      const payment = await createOrder(cart.totalAmount);
 
+      // 2️⃣ Razorpay checkout — MINIMAL & SAFE CONFIG
       const options = {
-        key: "rzp_test_SBA7ydUnLAocKr", // 🔴 replace
-        amount: cart.totalAmount * 100,
-        currency: "INR",
-        name: "Vehicle Auction",
-        description: "Car Purchase Payment",
-        image: "https://cdn-icons-png.flaticon.com/512/743/743922.png",
+        key: "rzp_test_SBA7ydUnLAocKr", // must match backend key
         order_id: payment.razorpayOrderId,
 
+        name: "Vehicle Auction",
+        description: "Checkout Payment",
+
         handler: async function (response) {
+          // 3️⃣ Verify payment (NO JWT)
           await verifyPayment({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
+            razorpayOrderId: response.razorpay_order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpaySignature: response.razorpay_signature,
           });
 
           alert("✅ Payment Successful!");
           navigate("/user/dashboard");
-        },
-
-        prefill: {
-          name: "Customer",
-          email: "customer@email.com",
-        },
-
-        theme: { color: "#0d6efd" },
+        }
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      new window.Razorpay(options).open();
 
     } catch (err) {
       console.error(err);
-      alert("Payment failed");
+      alert("Payment failed. Please try again.");
     }
   };
 
-  if (loading) return <div className="text-center mt-5">Loading...</div>;
+  if (loading) {
+    return <div className="text-center mt-5">Loading...</div>;
+  }
 
   if (!cart || cart.cars.length === 0) {
     return (
@@ -79,47 +74,28 @@ const PaymentPage = () => {
     <div className="container py-5">
       <div className="row g-4">
 
-        {/* LEFT: USER + PAYMENT INFO */}
+        {/* LEFT: INFO */}
         <div className="col-lg-7">
           <div className="card shadow-sm p-4">
             <h4 className="mb-3">Billing Details</h4>
-            <div className="mb-3">
-              <label className="form-label">Full Name</label>
-              <input type="text" className="form-control" placeholder="Enter name" />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Email</label>
-              <input type="email" className="form-control" placeholder="Enter email" />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Phone</label>
-              <input type="text" className="form-control" placeholder="Enter phone" />
-            </div>
-          </div>
-
-          <div className="card shadow-sm p-4 mt-4">
-            <h5>Secure Payment</h5>
             <p className="text-muted small">
-              Your payment is securely processed by Razorpay. We do not store card details.
+              Payment will be securely processed via Razorpay.
             </p>
-            <img
-              src="https://razorpay.com/assets/razorpay-glyph.svg"
-              alt="Razorpay"
-              width="80"
-            />
           </div>
         </div>
 
         {/* RIGHT: ORDER SUMMARY */}
         <div className="col-lg-5">
-          <div className="card shadow-lg p-4">
+          <div className="card shadow-lg p-4 border-primary">
             <h4 className="mb-3">Order Summary</h4>
 
             {cart.cars.map((item) => (
               <div key={item.id} className="d-flex justify-content-between mb-3">
                 <div>
                   <strong>{item.brand} {item.model}</strong>
-                  <div className="text-muted small">{item.registrationNo}</div>
+                  <div className="text-muted small">
+                    {item.registrationNo}
+                  </div>
                 </div>
                 <div>₹{item.price?.toLocaleString()}</div>
               </div>
@@ -127,33 +103,19 @@ const PaymentPage = () => {
 
             <hr />
 
-            <div className="d-flex justify-content-between">
-              <span>Subtotal</span>
-              <span>₹{cart.totalAmount?.toLocaleString()}</span>
-            </div>
-
-            <div className="d-flex justify-content-between">
-              <span>Platform Fee</span>
-              <span className="text-success">Free</span>
-            </div>
-
-            <hr />
-
             <div className="d-flex justify-content-between fs-5 fw-bold">
               <span>Total</span>
-              <span className="text-success">₹{cart.totalAmount?.toLocaleString()}</span>
+              <span className="text-success">
+                ₹{cart.totalAmount?.toLocaleString()}
+              </span>
             </div>
 
             <button
-              className="btn btn-primary w-100 mt-4 py-2 fw-bold"
+              className="btn btn-primary w-100 mt-4 py-3 fw-bold"
               onClick={handlePayment}
             >
               🔒 Pay Securely
             </button>
-
-            <p className="text-center text-muted small mt-2">
-              100% secure checkout
-            </p>
           </div>
         </div>
 

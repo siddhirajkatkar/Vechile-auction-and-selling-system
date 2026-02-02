@@ -9,11 +9,11 @@ import lombok.Setter;
 public class PaymentVerifyDto {
 
     @NotBlank
-    private String razorpay_order_id;
+    private String razorpayOrderId;
 
     @NotBlank
-    private String razorpay_payment_id;
+    private String razorpayPaymentId;
 
     @NotBlank
-    private String razorpay_signature;
+    private String razorpaySignature; // ✅ FIXED NAME
 }

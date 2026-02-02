@@ -194,6 +194,27 @@ public class AuctionServiceImpl implements AuctionService {
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    public void markAsPaid(Long auctionId) {
+
+        Auction auction = auctionRepo.findById(auctionId)
+                .orElseThrow(() -> new RuntimeException("Auction not found"));
+
+        if (auction.getStatus() != AuctionStatus.COMPLETED) {
+            throw new RuntimeException("Auction not completed yet");
+        }
+
+        if (auction.isPaid()) {
+            throw new RuntimeException("Auction already paid");
+        }
+
+        auction.setPaid(true);
+        auction.setPaymentTime(LocalDateTime.now());
+
+        auctionRepo.save(auction);
+    }
+
 
 
 }

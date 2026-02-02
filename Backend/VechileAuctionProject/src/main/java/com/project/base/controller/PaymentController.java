@@ -4,13 +4,10 @@ import com.project.base.dto.PaymentVerifyDto;
 import com.project.base.pojo.Payment;
 import com.project.base.security.MyUserDetails;
 import com.project.base.services.PaymentService;
-
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/user/payment")
@@ -19,25 +16,30 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+    // =========================
+    // CREATE ORDER (JWT REQUIRED)
+    // =========================
     @PostMapping("/create-order")
-    public Payment createOrder(@RequestParam Double amount,
-                               @AuthenticationPrincipal MyUserDetails user) throws Exception {
+    public Payment createOrder(
+            @RequestParam Double amount,
+            @AuthenticationPrincipal MyUserDetails user) throws Exception {
 
         return paymentService.createOrder(amount, user.getUser().getId());
     }
 
-    @PostMapping("/verify")
-    public String verify(@RequestBody @Valid PaymentVerifyDto data,
-                         @AuthenticationPrincipal MyUserDetails user) throws Exception {
+    // =========================
+    // VERIFY PAYMENT (NO JWT)
+    // =========================
+    @PostMapping("/razorpay/verify")
+    public ResponseEntity<String> verifyPayment(
+            @RequestBody PaymentVerifyDto dto) {
 
         paymentService.verifyPayment(
-                data.getRazorpay_order_id(),
-                data.getRazorpay_payment_id(),
-                data.getRazorpay_signature(),
-                user.getUser().getId()
+                dto.getRazorpayOrderId(),
+                dto.getRazorpayPaymentId(),
+                dto.getRazorpaySignature()
         );
 
-        return "Payment Success";
+        return ResponseEntity.ok("Payment Success");
     }
-
 }

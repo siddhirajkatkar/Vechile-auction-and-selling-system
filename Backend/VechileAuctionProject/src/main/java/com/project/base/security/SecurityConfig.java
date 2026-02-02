@@ -54,18 +54,29 @@ public class SecurityConfig {
 
             // Authorization rules
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/uploads/**").permitAll()
-                .requestMatchers("/api/cars/all").permitAll()
-                .requestMatchers("/user/payment/**").permitAll() // 🔹 only for testing
 
-                .requestMatchers(
-                    "/api/auth/**",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )
+            	    // Public resources
+            	    .requestMatchers("/uploads/**").permitAll()
+            	    .requestMatchers("/api/cars/all").permitAll()
+
+            	    // Auth & docs
+            	    .requestMatchers(
+            	        "/api/auth/**",
+            	        "/v3/api-docs/**",
+            	        "/swagger-ui/**",
+            	        "/swagger-ui.html"
+            	    ).permitAll()
+
+            	    // 🔥 Razorpay callbacks ONLY
+            	    .requestMatchers(
+            	        "/user/payment/razorpay/verify",
+            	        "/user/subscription/razorpay/verify"
+            	    ).permitAll()
+
+            	    // Everything else requires JWT
+            	    .anyRequest().authenticated()
+            	)
+
 
             // Disable default login mechanisms 🚫
             .formLogin(form -> form.disable())

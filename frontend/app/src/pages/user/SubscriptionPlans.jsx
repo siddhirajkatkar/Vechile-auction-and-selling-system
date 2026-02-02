@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../services/axios";
-import { createOrder, verifyPayment } from "../../services/paymentService";
 
 const SubscriptionPlans = () => {
   const [plans, setPlans] = useState([]);
@@ -24,40 +23,14 @@ const SubscriptionPlans = () => {
     }
   };
 
-  // 🔥 FINAL BUY PLAN WITH PAYMENT
+  // ✅ SIMPLE BUY PLAN (NO RAZORPAY)
   const buyPlan = async (plan) => {
     try {
-      // 1️⃣ Create Razorpay order
-      const order = await createOrder(plan.price);
-
-      const options = {
-        key: "rzp_test_xxxxx", // 👉 YOUR RAZORPAY TEST KEY
-        amount: order.amount,
-        currency: "INR",
-        name: "AuctionMart",
-        description: "Subscription Plan Purchase",
-        order_id: order.razorpayOrderId,
-
-        handler: async function (response) {
-          // 2️⃣ Verify payment
-          await verifyPayment({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-          });
-
-          alert("Payment successful!");
-          navigate("/user/my-subscription");
-        },
-
-        theme: { color: "#0d6efd" },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-
+      await axios.post(`/api/subscriptions/buy/${plan.planName}`);
+      alert("✅ Subscription activated successfully!");
+      navigate("/user/my-subscription");
     } catch (err) {
-      alert("Payment failed. Please try again.");
+      alert("❌ Failed to activate subscription");
     }
   };
 
@@ -127,7 +100,7 @@ const SubscriptionPlans = () => {
                       }`}
                       onClick={() => buyPlan(plan)}
                     >
-                      {isPremium ? "Get Pro Access" : "Choose Plan"}
+                      {isPremium ? "Activate Pro Plan" : "Activate Plan"}
                     </button>
                   </div>
                 </div>

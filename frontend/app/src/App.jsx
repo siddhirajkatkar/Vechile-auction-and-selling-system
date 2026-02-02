@@ -25,7 +25,8 @@ import ViewAuctions from "./pages/admin/ViewAuctions";
 import WonAuctions from "./pages/user/WonAuctions";
 import AdminAuctions from "./pages/admin/AdminAuctions";
 import Cart from "./pages/cart/Cart";
-import PaymentPage from "./pages/payment/paymentPage";
+import PaymentPage from "./pages/payment/PaymentPage";
+import Checkout from "./pages/user/Checkout";
 import ResetPassword from "./pages/auth/ResetPasssword";
 
 function App() {
@@ -66,6 +67,9 @@ function App() {
 
       <Route path="/user/won-auctions" element={<WonAuctions />} />
       <Route path="/admin/auctions" element={<AdminAuctions />}/>
+
+      <Route path="/user/payment/:auctionId" element={<Checkout />} />
+
 
 
     </Routes>

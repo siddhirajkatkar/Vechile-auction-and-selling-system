@@ -1,11 +1,12 @@
 package com.project.base.services.impl;
 
 import com.project.base.pojo.*;
-import com.project.base.pojo.Payment;
 import com.project.base.repository.PaymentRepository;
 import com.project.base.repository.UserRepository;
 import com.project.base.services.PaymentService;
-import com.razorpay.*;
+import com.project.base.utils.RazorpaySignatureUtil;
+import com.razorpay.Order;
+import com.razorpay.RazorpayClient;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${razorpay.key.secret}")
     private String keySecret;
 
+    // =========================
+    // CREATE ORDER (JWT REQUIRED)
+    // =========================
     @Override
     public Payment createOrder(Double amount, Long userId) throws Exception {
 
@@ -40,34 +44,53 @@ public class PaymentServiceImpl implements PaymentService {
 
         Order order = client.orders.create(options);
 
-        User user = userRepo.findById(userId).orElseThrow();
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Payment payment = Payment.builder()
                 .razorpayOrderId(order.get("id"))
                 .amount(amount)
                 .status(PaymentStatus.CREATED)
-                .paymentTime(LocalDateTime.now())
+                .paymentTime(LocalDateTime.now()) // order creation time
                 .user(user)
                 .build();
 
         return paymentRepo.save(payment);
     }
 
+    // =========================
+    // VERIFY PAYMENT (NO JWT)
+    // =========================
     @Override
-    public void verifyPayment(String orderId, String paymentId, String signature, Long userId) throws Exception {
+    public void verifyPayment(String orderId,
+                              String paymentId,
+                              String signature) {
 
-        String payload = orderId + "|" + paymentId;
-        String generatedSignature = Utils.getHash(payload, keySecret);
+        // 🔐 1. Verify Razorpay signature
+        boolean isValid = RazorpaySignatureUtil.verify(
+                orderId,
+                paymentId,
+                signature,
+                keySecret
+        );
 
-        if (!generatedSignature.equals(signature)) {
-            throw new RuntimeException("Invalid payment signature");
+        if (!isValid) {
+            throw new RuntimeException("Invalid Razorpay signature");
         }
 
-        Payment payment = paymentRepo.findAll().stream()
-                .filter(p -> p.getRazorpayOrderId().equals(orderId))
-                .findFirst()
-                .orElseThrow();
+        // 🔍 2. Fetch payment safely
+        Payment payment = paymentRepo
+                .findByRazorpayOrderId(orderId)
+                .orElseThrow(() ->
+                        new RuntimeException("Payment not found for orderId: " + orderId)
+                );
 
+        // 🔁 3. Idempotency check
+        if (payment.getStatus() == PaymentStatus.SUCCESS) {
+            return; // already processed
+        }
+
+        // ✅ 4. Update payment
         payment.setRazorpayPaymentId(paymentId);
         payment.setRazorpaySignature(signature);
         payment.setStatus(PaymentStatus.SUCCESS);

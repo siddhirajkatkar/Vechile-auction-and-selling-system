@@ -45,4 +45,6 @@ public interface AuctionService {
     List<AuctionResponseDTO> getMyWonAuctions(User user);
 
 	List<AuctionResponseDTO> getAllAuctionsForAdmin();
+    void markAsPaid(Long auctionId);
+
 }
