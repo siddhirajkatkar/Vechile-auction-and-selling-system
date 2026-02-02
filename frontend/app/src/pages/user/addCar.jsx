@@ -6,6 +6,9 @@ const AddCar = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  // UI-only username (safe default)
+  const username = localStorage.getItem("username") || "User";
+
   const [car, setCar] = useState({
     registrationNo: "",
     brand: "",
@@ -69,27 +72,52 @@ const AddCar = () => {
 
   return (
     <div className="min-vh-100 pb-5" style={{ backgroundColor: "#f8f9fa" }}>
-      <div className="bg-white border-bottom py-4 mb-5 shadow-sm">
+
+      {/* HEADER */}
+      <div className="bg-white border-bottom py-3 mb-5 shadow-sm sticky-top">
         <div className="container d-flex justify-content-between align-items-center">
+
           <div>
-            <button className="btn btn-link text-decoration-none text-muted p-0 mb-1" onClick={() => navigate("/user/dashboard")}>
-              <i className="bi bi-arrow-left me-1"></i> Dashboard
+            <button
+              className="btn btn-outline-secondary btn-sm rounded-pill mb-2"
+              onClick={() => navigate("/user/dashboard")}
+            >
+              <i className="bi bi-arrow-left me-1"></i> Back to Dashboard
             </button>
-            <h3 className="fw-bold mb-0 text-dark">List Your <span className="text-primary">Vehicle</span></h3>
+
+            <h3 className="fw-bold mb-0 text-dark">
+              List Your <span className="text-primary">Vehicle</span>
+            </h3>
           </div>
-          <div className="d-none d-md-block text-muted small fw-bold">STEP 1 OF 1: VEHICLE DETAILS</div>
+
+          <div className="d-flex align-items-center gap-2">
+            <div
+              className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
+              style={{ width: "38px", height: "38px" }}
+            >
+              {username.charAt(0).toUpperCase()}
+            </div>
+            <div className="text-end">
+              <div className="fw-bold text-dark">{username}</div>
+              <div className="small text-muted">Seller Dashboard</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
+      {/* FORM */}
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-lg-10">
             <div className="card border-0 shadow-lg p-3 p-md-4" style={{ borderRadius: "20px" }}>
               <form onSubmit={submitCar}>
-                
+
                 {/* VEHICLE IDENTIFICATION */}
                 <div className="mb-5">
-                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Vehicle Identification</h5>
+                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">
+                    Vehicle Identification
+                  </h5>
                   <div className="row g-3">
                     <div className="col-md-6">
                       <label className="form-label small fw-bold">Registration Number</label>
@@ -112,7 +140,9 @@ const AddCar = () => {
 
                 {/* TECHNICAL SPECIFICATIONS */}
                 <div className="mb-5">
-                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Technical Specifications</h5>
+                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">
+                    Technical Specifications
+                  </h5>
                   <div className="row g-3">
                     <div className="col-md-4">
                       <label className="form-label small fw-bold">Manufacture Year</label>
@@ -136,12 +166,10 @@ const AddCar = () => {
                         <option value="AUTOMATIC">Automatic</option>
                       </select>
                     </div>
-
                     <div className="col-md-4">
                       <label className="form-label small fw-bold">Engine Capacity (CC)</label>
                       <input type="number" name="engineCc" className="form-control custom-input" onChange={handleChange} />
                     </div>
-
                     <div className="col-md-4">
                       <label className="form-label small fw-bold">Mileage</label>
                       <input type="number" step="0.1" name="mileage" className="form-control custom-input" onChange={handleChange} />
@@ -151,7 +179,9 @@ const AddCar = () => {
 
                 {/* CONDITION & PRICING */}
                 <div className="mb-5">
-                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Condition & Pricing</h5>
+                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">
+                    Condition & Pricing
+                  </h5>
                   <div className="row g-3">
                     <div className="col-md-4">
                       <label className="form-label small fw-bold">Distance Driven (KM)</label>
@@ -181,17 +211,19 @@ const AddCar = () => {
 
                 {/* DESCRIPTION */}
                 <div className="mb-5">
-                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">Vehicle Description</h5>
+                  <h5 className="fw-bold text-secondary mb-4 border-start border-primary border-4 ps-3">
+                    Vehicle Description
+                  </h5>
                   <textarea
                     name="description"
                     rows="4"
-                    placeholder="Add extra details about condition, features, modifications, etc."
                     className="form-control custom-input"
+                    placeholder="Add extra details about condition, features, modifications, etc."
                     onChange={handleChange}
                   />
                 </div>
 
-                <div className="d-grid mt-4">
+                <div className="d-grid">
                   <button type="submit" disabled={loading} className="btn btn-primary btn-lg rounded-pill shadow fw-bold py-3">
                     {loading ? "Processing..." : <><i className="bi bi-cloud-arrow-up me-2"></i> Publish Vehicle</>}
                   </button>
@@ -203,6 +235,7 @@ const AddCar = () => {
         </div>
       </div>
 
+      {/* STYLES */}
       <style>{`
         .custom-input {
           padding: 0.75rem 1rem;
@@ -216,8 +249,11 @@ const AddCar = () => {
           background-color: #fff;
           box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
         }
-        .form-label { color: #555; }
+        .form-label {
+          color: #555;
+        }
       `}</style>
+
     </div>
   );
 };

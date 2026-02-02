@@ -7,6 +7,7 @@ const ViewAuction = () => {
   const navigate = useNavigate();
 
   const loggedInUserId = Number(localStorage.getItem("userId"));
+  const username = localStorage.getItem("username") || "User";
 
   const [auction, setAuction] = useState(null);
   const [bids, setBids] = useState([]);
@@ -62,7 +63,7 @@ const ViewAuction = () => {
     });
   };
 
-  // 🔥 FINAL BID LOGIC WITH MEANINGFUL ERRORS
+  // 🔨 PLACE BID
   const placeBid = async (customAmount = null) => {
     if (auction.status !== "ACTIVE") {
       setMessage("❌ This auction has already ended.");
@@ -85,29 +86,26 @@ const ViewAuction = () => {
       setBidAmount("");
       fetchAuction();
       fetchBidHistory();
-
       setTimeout(() => setMessage(""), 3000);
 
     } catch (err) {
-  let backendMessage = "Bid failed. Please try again.";
+      let backendMessage = "Bid failed. Please try again.";
 
-  if (typeof err.response?.data === "string") {
-    backendMessage = err.response.data;
-  } else if (err.response?.data?.message) {
-    backendMessage = err.response.data.message;
-  }
+      if (typeof err.response?.data === "string") {
+        backendMessage = err.response.data;
+      } else if (err.response?.data?.message) {
+        backendMessage = err.response.data.message;
+      }
 
-  setMessage(`❌ ${backendMessage}`);
+      setMessage(`❌ ${backendMessage}`);
 
-  // Optional redirect for subscription-related issues
-  if (
-    backendMessage.toLowerCase().includes("subscription") ||
-    backendMessage.toLowerCase().includes("bids")
-  ) {
-    setTimeout(() => navigate("/user/subscriptions"), 2000);
-  }
-}
-
+      if (
+        backendMessage.toLowerCase().includes("subscription") ||
+        backendMessage.toLowerCase().includes("bids")
+      ) {
+        setTimeout(() => navigate("/user/subscriptions"), 2000);
+      }
+    }
   };
 
   if (loading) {
@@ -121,63 +119,77 @@ const ViewAuction = () => {
   const quickBidValue = (auction.currentPrice || 0) + 2000;
 
   return (
-    <div className="min-vh-100 pb-5 bg-light">
+    <div className="min-vh-100 bg-light pb-5">
 
       {/* HEADER */}
-      <nav className="navbar navbar-dark bg-dark px-4 py-3 sticky-top">
-        <button
-          className="btn btn-outline-light btn-sm rounded-pill"
-          onClick={() => navigate("/user/dashboard")}
-        >
-          ← Dashboard
-        </button>
+      <div className="bg-white border-bottom shadow-sm sticky-top">
+        <div className="container py-3 d-flex justify-content-between align-items-center">
 
-        <span className="navbar-brand ms-3 fw-bold">
-          Live Auction Room
-        </span>
+          <div>
+            <button
+              className="btn btn-outline-secondary btn-sm rounded-pill mb-2"
+              onClick={() => navigate("/user/dashboard")}
+            >
+              <i className="bi bi-arrow-left me-1"></i> Back to Dashboard
+            </button>
 
-        <span
-          className={`badge ${
-            auction.status === "ACTIVE" ? "bg-danger" : "bg-secondary"
-          }`}
-        >
-          {auction.status === "ACTIVE" ? "LIVE" : "ENDED"}
-        </span>
-      </nav>
+            <h4 className="fw-bold mb-0">
+              Live <span className="text-primary">Auction Room</span>
+            </h4>
+          </div>
+
+          <div className="d-flex align-items-center gap-2">
+            <span
+              className={`badge ${
+                auction.status === "ACTIVE" ? "bg-danger" : "bg-secondary"
+              } px-3 py-2`}
+            >
+              {auction.status === "ACTIVE" ? "LIVE" : "ENDED"}
+            </span>
+
+            <div
+              className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
+              style={{ width: "38px", height: "38px" }}
+            >
+              {username.charAt(0).toUpperCase()}
+            </div>
+          </div>
+
+        </div>
+      </div>
 
       <div className="container mt-4">
 
         {message && (
-          <div className="alert alert-info text-center">
-            {message}
-          </div>
+          <div className="alert alert-info text-center">{message}</div>
         )}
 
         {/* AUCTION CARD */}
         <div className="card shadow-sm rounded-4 mb-4">
           <div className="card-body text-center">
+
             <h2 className="fw-bold">
               {auction.brand} {auction.model}
             </h2>
 
             <p className="text-muted">
-              {remainingTime(auction.endTime)}
+              ⏳ {remainingTime(auction.endTime)}
             </p>
 
-            <h1 className="text-primary fw-bold">
+            <h1 className="text-primary fw-bold mb-4">
               ₹{auction.currentPrice?.toLocaleString()}
             </h1>
 
             {/* 🏆 WINNER */}
             {auction.status === "COMPLETED" && auction.winnerName && (
-              <div className="alert alert-success mt-4 rounded-4">
+              <div className="alert alert-success rounded-4">
                 🏆 <strong>{auction.winnerName}</strong> won this auction
                 <br />
                 Final Price: ₹{auction.finalPrice?.toLocaleString()}
               </div>
             )}
 
-            {/* 💳 PAYMENT – WINNER ONLY */}
+            {/* 💳 PAYMENT */}
             {auction.status === "COMPLETED" &&
               auction.winnerId === loggedInUserId && (
                 <button
@@ -194,7 +206,7 @@ const ViewAuction = () => {
             {auction.status === "ACTIVE" && (
               <div className="mt-4">
                 <button
-                  className="btn btn-outline-primary btn-lg w-100 mb-3 rounded-pill"
+                  className="btn btn-outline-primary btn-lg w-100 mb-3 rounded-pill fw-bold"
                   onClick={() => placeBid(quickBidValue)}
                 >
                   Quick Bid ₹{quickBidValue.toLocaleString()}
@@ -209,7 +221,7 @@ const ViewAuction = () => {
                 />
 
                 <button
-                  className="btn btn-primary btn-lg w-100 rounded-pill"
+                  className="btn btn-primary btn-lg w-100 rounded-pill fw-bold"
                   onClick={() => placeBid()}
                 >
                   Place Bid
@@ -233,14 +245,14 @@ const ViewAuction = () => {
             ) : (
               bids.map((b, i) => (
                 <div key={i} className="list-group-item">
-                  <div className="d-flex justify-content-between">
+                  <div className="d-flex justify-content-between align-items-center">
                     <div>
                       <strong>{b.bidderName}</strong>
                       <div className="text-muted small">
                         {formatBidTime(b.bidTime)}
                       </div>
                     </div>
-                    <strong>
+                    <strong className="text-success">
                       ₹{b.bidAmount.toLocaleString()}
                     </strong>
                   </div>

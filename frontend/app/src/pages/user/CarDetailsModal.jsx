@@ -1,13 +1,42 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const CarDetailsModal = ({ car, onClose }) => {
+  const navigate = useNavigate();
+
+  // UI-only username (safe default)
+  const username = localStorage.getItem("username") || "User";
+
   if (!car) return null;
 
   return (
     <div className="car-modal-backdrop" onClick={onClose}>
       <div className="car-modal-box" onClick={(e) => e.stopPropagation()}>
 
-        {/* 🔴 CLOSE BUTTON OUTSIDE IMAGE */}
+        {/* HEADER */}
+        <div className="modal-header-custom">
+          <div>
+            <button
+              className="btn btn-outline-secondary btn-sm rounded-pill mb-2"
+              onClick={() => navigate("/user/dashboard")}
+            >
+              <i className="bi bi-arrow-left me-1"></i> Back to Dashboard
+            </button>
+            <h4 className="fw-bold mb-0">Vehicle Details</h4>
+          </div>
+
+          <div className="d-flex align-items-center gap-2">
+            <div className="avatar">
+              {username.charAt(0).toUpperCase()}
+            </div>
+            <div className="text-end small">
+              <div className="fw-bold">{username}</div>
+              <div className="text-muted">Logged in</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 🔴 CLOSE BUTTON */}
         <button className="close-btn" onClick={onClose}>✕</button>
 
         {/* IMAGE */}
@@ -19,19 +48,25 @@ const CarDetailsModal = ({ car, onClose }) => {
             style={{ height: "320px", objectFit: "cover", width: "100%" }}
           />
         ) : (
-          <div className="bg-light text-center py-5 rounded mb-3">No Image</div>
+          <div className="bg-light text-center py-5 rounded mb-3">
+            No Image Available
+          </div>
         )}
 
         {/* TITLE */}
-        <h3 className="fw-bold mb-1">{car.brand} {car.model}</h3>
+        <h3 className="fw-bold mb-1">
+          {car.brand} {car.model}
+        </h3>
         <div className="text-muted small mb-2">
           {car.manufactureYear} • {car.fuelType} • {car.transmission}
         </div>
 
-        <h2 className="text-primary mb-3">₹{car.price?.toLocaleString()}</h2>
+        <h2 className="text-primary mb-4">
+          ₹{car.price?.toLocaleString()}
+        </h2>
 
         {/* CAR DETAILS */}
-        <div className="row g-2 small">
+        <div className="row g-3 small">
           <div className="col-4"><b>Manufacturer:</b> {car.manufacturer}</div>
           <div className="col-4"><b>Color:</b> {car.color}</div>
           <div className="col-4"><b>Engine CC:</b> {car.engineCc || "N/A"}</div>
@@ -46,8 +81,9 @@ const CarDetailsModal = ({ car, onClose }) => {
 
         {/* DESCRIPTION */}
         {car.description && (
-          <div className="mt-3 bg-light p-3 rounded small">
-            <b>Description:</b><br />{car.description}
+          <div className="mt-4 bg-light p-3 rounded small">
+            <b>Description</b>
+            <div className="mt-1">{car.description}</div>
           </div>
         )}
 
@@ -62,6 +98,7 @@ const CarDetailsModal = ({ car, onClose }) => {
         </div>
       </div>
 
+      {/* STYLES */}
       <style>{`
         .car-modal-backdrop {
           position: fixed;
@@ -84,7 +121,26 @@ const CarDetailsModal = ({ car, onClose }) => {
           animation: zoomIn 0.25s ease forwards;
         }
 
-        /* 🔴 RED CLOSE BUTTON */
+        .modal-header-custom {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .avatar {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          background: #0d6efd;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+        }
+
+        /* 🔴 CLOSE BUTTON */
         .close-btn {
           position: absolute;
           top: -18px;
