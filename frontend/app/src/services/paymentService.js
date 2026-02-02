@@ -1,17 +1,14 @@
 import axios from "../services/axios";
 
-// create Razorpay order
-export const createOrder = async (amount) => {
-  const res = await axios.post(
-    "/user/payment/create-order",
-    null,
-    { params: { amount } }
-  );
+
+export const createOrder = async ({ amount, paymentFor, referenceId }) => {
+  const res = await axios.post("/user/payment/create-order", null, {
+    params: { amount, paymentFor, referenceId }
+  });
   return res.data;
 };
 
-// verify payment
 export const verifyPayment = async (data) => {
-  const res = await axios.post("/user/payment/verify", data);
-  return res.data;
+  return axios.post("/user/payment/verify", data);
 };
+

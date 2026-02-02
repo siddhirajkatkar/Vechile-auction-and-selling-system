@@ -65,6 +65,14 @@ const UserDashboard = () => {
       path: "/user/car-for-sell",
       color: "bg-warning",
     },
+    {
+      title: "🧾 My Orders",
+      text: "See vehicles you successfully purchased.",
+      icon: "bi-receipt-cutoff",
+      path: "/user/my-orders",
+      color: "bg-success",
+    },
+
   ];
 
   return (

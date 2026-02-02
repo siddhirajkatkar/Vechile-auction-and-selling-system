@@ -15,6 +15,7 @@ import SubscriptionPlans from "./pages/user/SubscriptionPlans";
 import MySubscription from "./pages/user/MySubscription";
 import MyCars from "./pages/user/MyCars";
 import CarsForSale from "./pages/user/CarForSale";
+import MyOrdersPage from "./pages/order/MyOrdersPage";
 
 /* ================= ADMIN PAGES (UI ROUTES) ================= */
 import AdminDashboard from "./pages/admin/AdminDashBoard";
@@ -49,6 +50,7 @@ function App() {
       <Route path="/user/my-subscription" element={<MySubscription />} />
       <Route path="/user/my-cars" element={<MyCars />} />
       <Route path="/user/car-for-sell" element={<CarsForSale />} />
+      <Route path="/user/my-orders" element={<MyOrdersPage/>} />
 
       {/* Cart */}
 

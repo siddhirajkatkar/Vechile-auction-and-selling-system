@@ -106,8 +106,7 @@ public class CartServiceImpl implements CartService {
                 .sum();
         
 
-        return new CartResponseDTO(cars, totalAmount);
-    }
+        return new CartResponseDTO(cart.getId(), cars, totalAmount);    }
     	
     
     @Override

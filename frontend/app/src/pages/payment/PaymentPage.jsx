@@ -27,7 +27,7 @@ const PaymentPage = () => {
     try {
       const orderRes = await createOrder(cart.totalAmount);
       const payment = orderRes;
-
+        console.log(cart.totalAmount);
       const options = {
         key: "rzp_test_SBA7ydUnLAocKr", // 🔴 replace
         amount: cart.totalAmount * 100,

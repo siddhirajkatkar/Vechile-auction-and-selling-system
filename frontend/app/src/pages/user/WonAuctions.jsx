@@ -45,9 +45,17 @@ const WonAuctions = () => {
                 </p>
               </div>
 
-              <button
+             <button
                 className="btn btn-success"
-                onClick={() => navigate(`/payment/${a.auctionId}`)}
+                onClick={() =>
+                  startPayment({
+                    amount: a.currentPrice,
+                    paymentFor: "AUCTION_WIN",
+                    referenceId: a.auctionId,
+                    title: "Auction Winning Payment",
+                    onSuccess: () => navigate("/user/orders")
+                  })
+                }
               >
                 Make Payment
               </button>

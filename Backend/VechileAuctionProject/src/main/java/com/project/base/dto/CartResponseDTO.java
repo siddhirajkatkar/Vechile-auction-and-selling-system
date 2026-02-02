@@ -14,5 +14,13 @@ public class CartResponseDTO {
 
     private List<CarResponseDTO> cars;
     private double totalAmount;
+    private Long cartId;             
+
+
+    public CartResponseDTO(Long cartId, List<CarResponseDTO> cars, double totalAmount) {
+        this.cartId = cartId;
+        this.cars = cars;
+        this.totalAmount = totalAmount;
+    }
 }
 

@@ -4,6 +4,8 @@ import { getMyCart, removeFromCart } from "../../services/CartService";
 import CartItem from "./CartItem";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
+import { startPayment } from "../../util/startPayment";
+
 
 const Cart = () => {
   const [cart, setCart] = useState({ cars: [], totalAmount: 0 });
@@ -14,6 +16,7 @@ const Cart = () => {
     setLoading(true);
     try {
       const data = await getMyCart();
+      console.log(data.CartItem)
       setCart(data);
     } catch (err) {
       console.error(err);
@@ -56,7 +59,18 @@ const Cart = () => {
           <h4>Total Amount:</h4>
           <h4 className="text-success">₹{cart.totalAmount.toLocaleString()}</h4>
         </div>
-        <button className="btn btn-success btn-lg w-100 mt-3" onClick={()=>{navigate("/user/payment")}}>
+        <button
+              className="btn btn-success btn-lg w-100 mt-3"
+              onClick={() => {
+                        startPayment({
+            amount: cart.totalAmount,
+            paymentFor: "CAR_PURCHASE",
+            referenceId: cart.cartId,  // 🔹 use cart.cartId instead of cart.id
+            title: "Car Purchase Payment",
+            onSuccess: () => navigate("/user/dashboard")
+});
+              }}
+        >
           <i className="bi bi-cart-check-fill me-2"></i> Proceed to Checkout
         </button>
       </div>
