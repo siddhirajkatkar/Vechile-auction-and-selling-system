@@ -11,13 +11,9 @@ export const getMyCart = async () => {
 //   const res = await axiosInstance.delete(`/api/cart/remove/${cartItemId}`);
 //   return res.data;
 // };
-
 export const removeFromCart = async (cartItemId) => {
-  return await axiosInstance.delete(`/api/cart/remove/${cartItemId}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    }
-  });
+  const res = await axiosInstance.delete(`/api/cart/remove/${cartItemId}`);
+  return res.data;
 };
 
 

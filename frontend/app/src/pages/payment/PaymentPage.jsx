@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyCart } from "../../services/CartService";
-// import { createOrder, verifyPayment } from ".";
+import { createOrder, verifyPayment } from "../../services/paymentService";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const PaymentPage = () => {
@@ -26,10 +26,10 @@ const PaymentPage = () => {
   const handlePayment = async () => {
     try {
       const orderRes = await createOrder(cart.totalAmount);
-      const payment = orderRes.data;
+      const payment = orderRes;
 
       const options = {
-        key: "rzp_test_xxxxx", // 🔴 replace
+        key: "rzp_test_SBA7ydUnLAocKr", // 🔴 replace
         amount: cart.totalAmount * 100,
         currency: "INR",
         name: "Vehicle Auction",

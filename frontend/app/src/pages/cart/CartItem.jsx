@@ -40,7 +40,7 @@ const CartItem = ({ item, onRemove }) => {
         {/* Remove Button */}
         <div className="col-md-2 text-center">
           <button 
-            onClick={() => onRemove(item.id)} 
+            onClick={() => onRemove(item.cartItemId)} 
             className="btn btn-danger mt-4"
           >
             <i className="bi bi-trash-fill"></i> Remove

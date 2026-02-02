@@ -54,8 +54,9 @@ public class SecurityConfig {
 
             // Authorization rules
             .authorizeHttpRequests(auth -> auth
-            	.requestMatchers("/uploads/**").permitAll() 
-            	.requestMatchers("/api/cars/all").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
+                .requestMatchers("/api/cars/all").permitAll()
+                .requestMatchers("/user/payment/**").permitAll() // 🔹 only for testing
 
                 .requestMatchers(
                     "/api/auth/**",
@@ -66,11 +67,16 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
 
-            // JWT Filter
+            // Disable default login mechanisms 🚫
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable())
+
+            // JWT filter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     // =========================
     // AUTHENTICATION MANAGER
