@@ -1,4 +1,3 @@
-// services/axios.js
 import axios from "axios";
 
 const instance = axios.create({
@@ -8,7 +7,6 @@ const instance = axios.create({
   },
 });
 
-// Add JWT token automatically
 instance.interceptors.request.use(config => {
   const token = localStorage.getItem("token");
   if (token) config.headers["Authorization"] = `Bearer ${token}`;

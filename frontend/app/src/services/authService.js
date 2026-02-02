@@ -2,7 +2,6 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8080";
 
-// LOGIN (if you add it later)
 export const login = async (email, password) => {
   const response = await axios.post(
     `${API_BASE_URL}/api/auth/login`,
@@ -30,12 +29,10 @@ export const resetPassword = async (email, newPassword) => {
   );
   return response.data;
 };
-// REGISTER (THIS MATCHES BACKEND)
 export const register = async (userData) => {
   return axios.post(`${API_BASE_URL}/api/auth/register`, userData);
 };
 
-// LOGOUT
 export const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("role");

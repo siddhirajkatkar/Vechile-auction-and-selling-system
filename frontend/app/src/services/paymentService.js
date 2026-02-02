@@ -1,6 +1,5 @@
 import axios from "../services/axios";
 
-
 export const createOrder = async ({ amount, paymentFor, referenceId }) => {
   const res = await axios.post("/user/payment/create-order", null, {
     params: { amount, paymentFor, referenceId }

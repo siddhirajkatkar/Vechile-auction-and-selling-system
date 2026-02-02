@@ -1,4 +1,3 @@
-// src/services/carService.js
 import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8080";
@@ -8,7 +7,6 @@ export const addCar = async (car, images) => {
 
   const formData = new FormData();
 
-  // ✅ MUST match backend: @RequestPart("carData")
   formData.append(
     "carData",
     new Blob([JSON.stringify(car)], {
@@ -16,7 +14,6 @@ export const addCar = async (car, images) => {
     })
   );
 
-  // images (optional)
   if (images && images.length > 0) {
     Array.from(images).forEach((file) => {
       formData.append("images", file);
@@ -29,7 +26,6 @@ export const addCar = async (car, images) => {
     {
       headers: {
         Authorization: `Bearer ${token}`
-        // ❌ Do NOT set Content-Type manually
       }
     }
   );

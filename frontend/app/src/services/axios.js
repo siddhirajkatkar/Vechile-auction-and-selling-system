@@ -7,12 +7,10 @@ const axiosInstance = axios.create({
   },
 });
 
-// 🔐 Automatically attach JWT token (EXCEPT Razorpay)
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
 
-    // 🚫 DO NOT attach JWT for Razorpay verification
     if (token && !config.url.includes("/razorpay")) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -22,7 +20,6 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 🚨 Handle global errors (401 / 403)
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
