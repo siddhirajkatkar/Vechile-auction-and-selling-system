@@ -7,7 +7,7 @@ import Register from "./pages/auth/Register";
 
 /* ================= USER PAGES ================= */
 import UserDashboard from "./pages/user/UserDashBoard";
-import Auctions from "./pages/user/Auctions";
+import Auctions from "./pages/user/auctions";
 import ViewAuction from "./pages/user/ViewAuction";
 import MyBids from "./pages/user/MyBids";
 import AddCar from "./pages/user/addCar";
