@@ -1,5 +1,6 @@
 package com.project.base.repository;
 
+import com.project.base.pojo.OrderItem;
 import com.project.base.pojo.SubscriptionStatus;
 import com.project.base.pojo.User;
 import com.project.base.pojo.UserSubscription;
@@ -38,6 +39,8 @@ public interface UserSubscriptionRepository
     void deactivateActiveSubscriptions(Long userId,
                                        SubscriptionStatus active,
                                        SubscriptionStatus expired);
+
+    List<UserSubscription> findByUserAndStatus(User user, SubscriptionStatus status);
 
 
 }

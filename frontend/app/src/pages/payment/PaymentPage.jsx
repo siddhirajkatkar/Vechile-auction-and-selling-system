@@ -26,25 +26,28 @@ const PaymentPage = () => {
 
   const handlePayment = async () => {
     try {
-// <<<<<<< HEAD
-      const orderRes = await createOrder(cart.totalAmount);
-      const payment = orderRes;
-//         console.log(cart.totalAmount);
-// =======
-//       // 1️⃣ Create Razorpay order (JWT REQUIRED)
-//       const payment = await createOrder(cart.totalAmount);
+      // 1️⃣ Create Razorpay order
+      const payment = await createOrder(cart.totalAmount);
 
-//       // 2️⃣ Razorpay checkout — MINIMAL & SAFE CONFIG
-// >>>>>>> a674a0fdb23fde66a3a7cb4f7ae75e0df962642e
+      console.log("ORDER RESPONSE =>", payment);
+
       const options = {
-        key: "rzp_test_SBA7ydUnLAocKr", // must match backend key
-        order_id: payment.razorpayOrderId,
+        key: "rzp_test_SBA7ydUnLAocKr",
+
+        // ✅ CORRECT: Razorpay expects `id`
+        order_id: payment.id,
 
         name: "Vehicle Auction",
         description: "Checkout Payment",
 
         handler: async function (response) {
-          // 3️⃣ Verify payment (NO JWT)
+          console.log("VERIFY PAYLOAD =>", {
+            razorpayOrderId: response.razorpay_order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpaySignature: response.razorpay_signature,
+          });
+
+          // 2️⃣ Verify payment (camelCase → backend DTO)
           await verifyPayment({
             razorpayOrderId: response.razorpay_order_id,
             razorpayPaymentId: response.razorpay_payment_id,
@@ -53,11 +56,16 @@ const PaymentPage = () => {
 
           alert("✅ Payment Successful!");
           navigate("/user/dashboard");
-        }
+        },
+
+        modal: {
+          ondismiss: function () {
+            alert("Payment cancelled");
+          },
+        },
       };
 
       new window.Razorpay(options).open();
-
     } catch (err) {
       console.error(err);
       alert("Payment failed. Please try again.");
@@ -80,7 +88,7 @@ const PaymentPage = () => {
     <div className="container py-5">
       <div className="row g-4">
 
-        {/* LEFT: INFO */}
+        {/* LEFT */}
         <div className="col-lg-7">
           <div className="card shadow-sm p-4">
             <h4 className="mb-3">Billing Details</h4>
@@ -90,7 +98,7 @@ const PaymentPage = () => {
           </div>
         </div>
 
-        {/* RIGHT: ORDER SUMMARY */}
+        {/* RIGHT */}
         <div className="col-lg-5">
           <div className="card shadow-lg p-4 border-primary">
             <h4 className="mb-3">Order Summary</h4>

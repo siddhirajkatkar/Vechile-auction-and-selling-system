@@ -2,7 +2,8 @@ package com.project.base.utils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.codec.binary.Hex;
 
 public class RazorpaySignatureUtil {
 
@@ -12,19 +13,20 @@ public class RazorpaySignatureUtil {
             String orderId,
             String paymentId,
             String razorpaySignature,
-            String secret) {
-
+            String secret
+    ) {
         try {
             String payload = orderId + "|" + paymentId;
 
             Mac mac = Mac.getInstance(HMAC_SHA256);
             SecretKeySpec secretKey =
-                    new SecretKeySpec(secret.getBytes(), HMAC_SHA256);
+                    new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), HMAC_SHA256);
             mac.init(secretKey);
 
-            byte[] hash = mac.doFinal(payload.getBytes());
-            String generatedSignature =
-                    Base64.getEncoder().encodeToString(hash);
+            byte[] hash = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
+
+            // ✅ Razorpay expects HEX, not Base64
+            String generatedSignature = Hex.encodeHexString(hash);
 
             return generatedSignature.equals(razorpaySignature);
         } catch (Exception e) {

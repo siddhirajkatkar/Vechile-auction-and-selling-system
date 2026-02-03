@@ -5,6 +5,7 @@ import com.project.base.pojo.Payment;
 import com.project.base.pojo.PaymentFor;
 import com.project.base.security.MyUserDetails;
 import com.project.base.services.PaymentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,32 +22,47 @@ public class PaymentController {
     // CREATE ORDER (JWT REQUIRED)
     // =========================
     @PostMapping("/create-order")
-    public Payment createOrder(@RequestParam Double amount,
-                               @RequestParam PaymentFor paymentFor,
-                               @RequestParam Long referenceId,
-                               @AuthenticationPrincipal MyUserDetails user) throws Exception {
+    public ResponseEntity<Payment> createOrder(
+            @RequestParam Double amount,
+            @RequestParam PaymentFor paymentFor,
+            @RequestParam Long referenceId,
+            @AuthenticationPrincipal MyUserDetails user
+    ) throws Exception {
 
-        return paymentService.createOrder(
+        /*
+         * paymentFor = SUBSCRIPTION
+         * referenceId = planId
+         */
+        Payment payment = paymentService.createOrder(
                 amount,
                 user.getUser().getId(),
                 paymentFor,
                 referenceId
         );
+
+        return ResponseEntity.ok(payment);
     }
 
     // =========================
-    // VERIFY PAYMENT (NO JWT)
+    // VERIFY PAYMENT
     // =========================
     @PostMapping("/razorpay/verify")
     public ResponseEntity<String> verifyPayment(
-            @RequestBody PaymentVerifyDto dto) {
-
+            @Valid @RequestBody PaymentVerifyDto dto
+    ) {
+        /*
+         * This method will:
+         * 1. Verify Razorpay signature
+         * 2. Mark payment SUCCESS
+         * 3. ASSIGN PLAN TO USER (if paymentFor == SUBSCRIPTION)
+         * 4. Finalize auction (if paymentFor == AUCTION)
+         */
         paymentService.verifyPayment(
                 dto.getRazorpayOrderId(),
                 dto.getRazorpayPaymentId(),
                 dto.getRazorpaySignature()
         );
 
-        return ResponseEntity.ok("Payment Success");
+        return ResponseEntity.ok("Payment verified and plan assigned successfully");
     }
 }

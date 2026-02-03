@@ -37,8 +37,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     // ================= CREATE ORDER =================
     @Override
-    public Payment createOrder(Double amount, Long userId,
-                               PaymentFor paymentFor, Long referenceId) throws Exception {
+    public Payment createOrder(
+            Double amount,
+            Long userId,
+            PaymentFor paymentFor,
+            Long referenceId
+    ) throws Exception {
 
         RazorpayClient client = new RazorpayClient(keyId, keySecret);
 
@@ -57,7 +61,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .amount(amount)
                 .status(PaymentStatus.CREATED)
                 .paymentFor(paymentFor)
-                .referenceId(referenceId)
+                .referenceId(referenceId) // planId / auctionId / etc
                 .paymentTime(LocalDateTime.now())
                 .user(user)
                 .build();
@@ -67,26 +71,41 @@ public class PaymentServiceImpl implements PaymentService {
 
     // ================= VERIFY PAYMENT =================
     @Override
-    public void verifyPayment(String orderId,
-                              String paymentId,
-                              String signature) {
-
-        boolean isValid = RazorpaySignatureUtil.verify(orderId, paymentId, signature, keySecret);
-
-        if (!isValid) {
-            throw new RuntimeException("Invalid Razorpay signature");
-        }
-
+    public void verifyPayment(
+            String orderId,
+            String paymentId,
+            String signature
+    ) {
+        // 1️⃣ Fetch payment
         Payment payment = paymentRepo.findByRazorpayOrderId(orderId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
-        if (payment.getStatus() == PaymentStatus.SUCCESS) return;
+        // 2️⃣ IDEMPOTENCY CHECK
+        if (payment.getStatus() == PaymentStatus.SUCCESS) {
+            return;
+        }
 
+        // 3️⃣ Verify Razorpay signature
+        boolean isValid = RazorpaySignatureUtil.verify(
+                orderId,
+                paymentId,
+                signature,
+                keySecret
+        );
+
+        if (!isValid) {
+            payment.setStatus(PaymentStatus.FAILED);
+            paymentRepo.save(payment);
+            throw new RuntimeException("Invalid Razorpay signature");
+        }
+
+        // 4️⃣ Mark payment SUCCESS
         payment.setRazorpayPaymentId(paymentId);
         payment.setRazorpaySignature(signature);
         payment.setStatus(PaymentStatus.SUCCESS);
         paymentRepo.save(payment);
 
+        // 5️⃣ Perform business action
         switch (payment.getPaymentFor()) {
             case CAR_PURCHASE -> handleCarPurchase(payment);
             case SUBSCRIPTION -> handleSubscription(payment);
@@ -95,8 +114,10 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     // ================= HANDLERS =================
+
     private void handleCarPurchase(Payment payment) {
-        Cart cart = cartRepo.findByUser(payment.getUser()).orElseThrow();
+        Cart cart = cartRepo.findByUser(payment.getUser())
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         Order newOrder = Order.builder()
                 .user(payment.getUser())
@@ -118,27 +139,49 @@ public class PaymentServiceImpl implements PaymentService {
                 .toList();
 
         savedOrder.setItems(items);
-        savedOrder.setTotalAmount(items.stream().mapToDouble(OrderItem::getPriceAtPurchase).sum());
+        savedOrder.setTotalAmount(
+                items.stream().mapToDouble(OrderItem::getPriceAtPurchase).sum()
+        );
         orderRepo.save(savedOrder);
+
         cart.getItems().clear();
     }
 
+    /**
+     * ✅ ASSIGN SUBSCRIPTION PLAN TO USER
+     */
     private void handleSubscription(Payment payment) {
-        SubscriptionPlan plan = planRepo.findById(payment.getReferenceId()).orElseThrow();
 
-        UserSubscription sub = new UserSubscription();
-        sub.setUser(payment.getUser());
-        sub.setPlan(plan);
-        sub.setStartDate(LocalDateTime.now());
-        sub.setEndDate(LocalDateTime.now().plusDays(plan.getValidityDays()));
-        sub.setBidsRemaining(plan.getTotalBids());
-        sub.setStatus(SubscriptionStatus.ACTIVE);
+        SubscriptionPlan plan = planRepo.findById(payment.getReferenceId())
+                .orElseThrow(() -> new RuntimeException("Subscription plan not found"));
 
-        userSubRepo.save(sub);
+        // ✅ Expire existing ACTIVE subscriptions
+        List<UserSubscription> activeSubs =
+                userSubRepo.findByUserAndStatus(payment.getUser(), SubscriptionStatus.ACTIVE);
+
+        for (UserSubscription sub : activeSubs) {
+            sub.setStatus(SubscriptionStatus.EXPIRED);
+            sub.setEndDate(LocalDateTime.now());
+        }
+
+        // ✅ Create new subscription
+        UserSubscription newSub = new UserSubscription();
+        newSub.setUser(payment.getUser());
+        newSub.setPlan(plan);
+        newSub.setStartDate(LocalDateTime.now());
+        newSub.setEndDate(LocalDateTime.now().plusDays(plan.getValidityDays()));
+        newSub.setBidsRemaining(plan.getTotalBids());
+        newSub.setStatus(SubscriptionStatus.ACTIVE);
+
+        userSubRepo.save(newSub);
     }
 
+
     private void handleAuctionWin(Payment payment) {
-        Auction auction = auctionRepo.findById(payment.getReferenceId()).orElseThrow();
+        Auction auction = auctionRepo.findById(payment.getReferenceId())
+                .orElseThrow(() -> new RuntimeException("Auction not found"));
+
         auction.setPaymentStatus(PaymentStatus.SUCCESS);
+        auctionRepo.save(auction);
     }
 }

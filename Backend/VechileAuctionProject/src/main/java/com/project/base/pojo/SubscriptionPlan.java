@@ -2,12 +2,14 @@ package com.project.base.pojo;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "subscription_plans")
 @Getter
 @Setter
+@NoArgsConstructor // ✅ REQUIRED BY JPA
 public class SubscriptionPlan {
 
     @Id
@@ -27,10 +29,21 @@ public class SubscriptionPlan {
     @Column(name = "bids_per_auction")
     private int bidsPerAuction;
 
-	public long getValidityDays() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	@Column(name = "validity_days", nullable = false)
+    @Column(name = "validity_days", nullable = false)
     private int validityDays;
+
+    // ✅ CORRECT CONSTRUCTOR
+    public SubscriptionPlan(
+            PlanName planName,
+            double price,
+            int totalBids,
+            int bidsPerAuction,
+            int validityDays) {
+
+        this.planName = planName;
+        this.price = price;
+        this.totalBids = totalBids;
+        this.bidsPerAuction = bidsPerAuction;
+        this.validityDays = validityDays;
+    }
 }

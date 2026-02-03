@@ -8,6 +8,6 @@ export const createOrder = async ({ amount, paymentFor, referenceId }) => {
 };
 
 export const verifyPayment = async (data) => {
-  return axios.post("/user/payment/verify", data);
+  return axios.post("/user/payment/razorpay/verify", data);
 };
 
