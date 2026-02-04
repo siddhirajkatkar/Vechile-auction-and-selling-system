@@ -63,7 +63,6 @@ public class Car extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // ================= IMAGES =================
     @JsonManagedReference
     @OneToMany(
         mappedBy = "car",
@@ -73,7 +72,6 @@ public class Car extends BaseEntity {
     )
     private List<CarImage> images = new ArrayList<>();
 
-    // ================= SALE & STATUS =================
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "sale_type", nullable = false, length = 20)
@@ -84,7 +82,6 @@ public class Car extends BaseEntity {
     @Column(nullable = false, length = 30)
     private Status status;
 
-    // ================= SELLER =================
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
@@ -96,7 +93,6 @@ public class Car extends BaseEntity {
     })
     private User seller;
 
-    // ================= VEHICLE DETAILS =================
     @NotBlank
     @Column(nullable = false)
     private String manufacturer;
@@ -105,19 +101,12 @@ public class Car extends BaseEntity {
     @Column(name = "km_driven", nullable = false)
     private Integer kmDriven;
 
-    // ================= AUCTION CONTROL (NEW) =================
 
-    /**
-     * Number of completed auctions for this car.
-     * Used to enforce max auction attempts (e.g., 3).
-     */
+  
     @Column(name = "auction_attempts", nullable = false)
     private int auctionAttempts = 0;
 
-    /**
-     * Timestamp when the last auction ended (sold or unsold).
-     * Used to enforce cooldown (e.g., 24 hours).
-     */
+   
     @Column(name = "last_auction_ended_at")
     private LocalDateTime lastAuctionEndedAt;
 }

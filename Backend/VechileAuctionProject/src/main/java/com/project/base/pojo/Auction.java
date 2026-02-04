@@ -10,9 +10,7 @@ import java.util.List;
 @AttributeOverride(name = "id", column = @Column(name = "auction_id"))
 public class Auction extends BaseEntity {
 
-    // =========================
-    // RELATIONSHIPS
-    // =========================
+   
     @OneToOne
     @JoinColumn(name = "car_id", nullable = false, unique = true)
     private Car car;
@@ -24,9 +22,7 @@ public class Auction extends BaseEntity {
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bid> bids;
 
-    // =========================
-    // AUCTION DETAILS
-    // =========================
+  
     @Column(name = "start_price", precision = 10, scale = 2, nullable = false)
     private BigDecimal startPrice;
 
@@ -57,19 +53,14 @@ public class Auction extends BaseEntity {
 		this.paymentStatus = paymentStatus;
 	}
 
-	// getters & setters
-    // =========================
-    // PAYMENT TRACKING
-    // =========================
+	
     @Column(nullable = false)
     private boolean paid = false;
 
     @Column(name = "payment_time")
     private LocalDateTime paymentTime;
 
-    // =========================
-    // GETTERS & SETTERS
-    // =========================
+   
     public Car getCar() {
         return car;
     }

@@ -21,12 +21,11 @@ public class Role {
     @Column(name = "role_id")
     private Long roleId;
 
-    @Enumerated(EnumType.STRING)   // ✅ THIS FIXES THE ERROR
+    @Enumerated(EnumType.STRING)   
     @Column(name = "role_name", nullable = false, unique = true)
     private RoleName roleName;
 
- // In Role.java
     @ManyToMany(mappedBy = "roles")
-    @JsonIgnore // ✅ This prevents Jackson from trying to load the users of a role
+    @JsonIgnore 
     private Set<User> users = new HashSet<>();
 }

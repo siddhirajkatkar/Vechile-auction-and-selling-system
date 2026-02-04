@@ -41,5 +41,5 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentFor paymentFor;
 
-    private Long referenceId; // cartId / planId / auctionId
+    private Long referenceId; 
 }

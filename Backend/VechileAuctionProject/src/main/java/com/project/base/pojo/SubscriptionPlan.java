@@ -9,7 +9,7 @@ import lombok.Setter;
 @Table(name = "subscription_plans")
 @Getter
 @Setter
-@NoArgsConstructor // ✅ REQUIRED BY JPA
+@NoArgsConstructor 
 public class SubscriptionPlan {
 
     @Id
@@ -32,7 +32,6 @@ public class SubscriptionPlan {
     @Column(name = "validity_days", nullable = false)
     private int validityDays;
 
-    // ✅ CORRECT CONSTRUCTOR
     public SubscriptionPlan(
             PlanName planName,
             double price,

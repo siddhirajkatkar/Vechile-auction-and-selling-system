@@ -17,13 +17,7 @@ import java.util.Optional;
 
 public interface BidRepository extends JpaRepository<Bid, Long> {
 
-    // ===============================
-    // HIGHEST BID (AUCTION WINNER)
-    // ===============================
-
-    /**
-     * Get highest bid amount in an auction
-     */
+   
     @Query("""
         SELECT MAX(b.bidAmount)
         FROM Bid b
@@ -33,18 +27,10 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             @Param("auctionId") Long auctionId
     );
 
-    /**
-     * Get highest bid entity (used when auction ends)
-     */
+   
     Bid findTopByAuctionOrderByBidAmountDesc(Auction auction);
 
-    // ===============================
-    // USER BID HISTORY
-    // ===============================
-
-    /**
-     * Get all distinct auction IDs where a user has placed bids
-     */
+   
     @Query("""
         SELECT DISTINCT b.auction.id
         FROM Bid b
@@ -54,9 +40,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             @Param("bidderId") Long bidderId
     );
 
-    /**
-     * Get highest bid amount by a specific user in a specific auction
-     */
+    
     @Query("""
         SELECT MAX(b.bidAmount)
         FROM Bid b
@@ -68,9 +52,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             @Param("auctionId") Long auctionId
     );
 
-    /**
-     * Get all bids for an auction (ordered by highest bid first)
-     */
+   
     @Query("""
         SELECT b
         FROM Bid b
@@ -81,18 +63,10 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             @Param("auctionId") Long auctionId
     );
 
-    /**
-     * Get bid history of a user (latest bids first)
-     */
+    
     List<Bid> findByBidderOrderByBidTimeDesc(User bidder);
 
-    // ===============================
-    // CONCURRENCY SAFETY (OPTIONAL)
-    // ===============================
-
-    /**
-     * Lock bids for an auction (used in high-concurrency bidding)
-     */
+    
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
         SELECT b
