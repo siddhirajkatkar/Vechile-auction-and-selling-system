@@ -30,11 +30,7 @@ public class CarController {
     @Autowired
     private CarService carService;
 
-    // ================= SELLER =================
-
-    /**
-     * Seller adds a new car (saved as DRAFT)
-     */
+    
     @PostMapping(
         value = "/add",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -57,9 +53,7 @@ public class CarController {
                 ));
     }
 
-    /**
-     * Seller submits car for admin approval
-     */
+   
     @PutMapping("/submit/{carId}")
     @PreAuthorize("hasAuthority('ROLE_SELLER')")
     public ResponseEntity<ApiResponse> submitForApproval(
@@ -73,11 +67,7 @@ public class CarController {
         );
     }
 
-    // ================= BUYER / PUBLIC =================
-
-    /**
-     * Get all approved & available cars
-     */
+   
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAvailableCars() {

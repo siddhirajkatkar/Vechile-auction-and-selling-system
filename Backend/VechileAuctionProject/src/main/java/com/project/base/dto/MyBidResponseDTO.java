@@ -16,5 +16,5 @@ public class MyBidResponseDTO {
     private LocalDateTime bidTime;
     private String auctionStatus;
 
-    // getters & setters
+   
 }

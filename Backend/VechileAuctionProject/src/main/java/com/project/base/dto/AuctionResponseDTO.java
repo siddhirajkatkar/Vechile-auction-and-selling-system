@@ -15,12 +15,10 @@ public class AuctionResponseDTO {
     private LocalDateTime endTime;
     private String status;
 
-    // ===== WINNER DETAILS =====
     private Long winnerId;
     private String winnerName;
     private BigDecimal finalPrice;
 
-    // ===== Getters & Setters =====
 
     public Long getAuctionId() {
         return auctionId;
@@ -78,7 +76,6 @@ public class AuctionResponseDTO {
         this.status = status;
     }
 
-    // ===== WINNER GETTERS & SETTERS =====
 
     public Long getWinnerId() {
         return winnerId;

@@ -23,7 +23,6 @@ public class AuctionController {
     @Autowired
     private UserService userService;
 
-    // ================= BUYER =================
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER','ROLE_SELLER','ROLE_ADMIN')")
@@ -46,7 +45,6 @@ public class AuctionController {
         );
     }
 
-    // ================= SELLER =================
 
     @PostMapping("/start/{carId}")
     @PreAuthorize("hasAuthority('ROLE_SELLER')")
@@ -62,11 +60,7 @@ public class AuctionController {
         );
     }
 
-    // ================= USER DASHBOARD =================
-
-    /**
-     * Get auctions won by the logged-in user
-     */
+ 
     @GetMapping("/my-wins")
     @PreAuthorize("hasAuthority('ROLE_BUYER')")
     public ResponseEntity<List<AuctionResponseDTO>> getMyWonAuctions() {

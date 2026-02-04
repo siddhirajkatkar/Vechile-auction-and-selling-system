@@ -16,7 +16,6 @@ public class MyBidVehicleDTO {
     private String auctionStatus;
     private boolean won;
 
-    // getters & setters
     public Long getAuctionId() {
         return auctionId;
     }

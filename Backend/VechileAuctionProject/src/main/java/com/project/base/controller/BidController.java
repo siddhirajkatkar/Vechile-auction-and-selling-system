@@ -28,7 +28,6 @@ public class BidController {
     @Autowired
     private UserService userService;
 
-    // ================= PLACE BID =================
     @PostMapping("/place/{auctionId}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER','ROLE_SELLER')")
     public ResponseEntity<ApiResponse> placeBid(

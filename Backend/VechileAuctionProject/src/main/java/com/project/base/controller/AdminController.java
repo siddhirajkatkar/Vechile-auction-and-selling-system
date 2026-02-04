@@ -24,7 +24,6 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
-    // --- USER MANAGEMENT ---
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {
@@ -39,7 +38,6 @@ public class AdminController {
         );
     }
 
-    // --- VEHICLE MANAGEMENT ---
 
     @GetMapping("/vehicles/pending")
     public ResponseEntity<List<CarResponseDTO>> getPendingCars() {
