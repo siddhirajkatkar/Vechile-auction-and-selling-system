@@ -50,7 +50,6 @@ public class AuthServiceImpl implements AuthService {
                         new RuntimeException("Role not assigned to user")
                 );
 
-        // ✅ FIXED ORDER
         return new AuthResponseDto(
                 user.getId(),
                 user.getFirstName(),

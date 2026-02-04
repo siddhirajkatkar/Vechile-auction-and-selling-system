@@ -25,7 +25,6 @@ public class RazorpaySignatureUtil {
 
             byte[] hash = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
 
-            // ✅ Razorpay expects HEX, not Base64
             String generatedSignature = Hex.encodeHexString(hash);
 
             return generatedSignature.equals(razorpaySignature);

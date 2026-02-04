@@ -35,8 +35,7 @@ public class AuctionServiceImpl implements AuctionService {
     @Autowired
     private BidRepository bidRepo;
 
-    // ================= BUYER =================
-
+ 
     @Override
     @Transactional(readOnly = true)
     public List<AuctionResponseDTO> viewActiveAuctions(Long userId) {

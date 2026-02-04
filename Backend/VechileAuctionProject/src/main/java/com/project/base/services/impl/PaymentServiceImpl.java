@@ -35,7 +35,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${razorpay.key.secret}")
     private String keySecret;
 
-    // ================= CREATE ORDER =================
     @Override
     public Payment createOrder(
             Double amount,
@@ -61,7 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .amount(amount)
                 .status(PaymentStatus.CREATED)
                 .paymentFor(paymentFor)
-                .referenceId(referenceId) // planId / auctionId / etc
+                .referenceId(referenceId) 
                 .paymentTime(LocalDateTime.now())
                 .user(user)
                 .build();
@@ -69,23 +68,19 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepo.save(payment);
     }
 
-    // ================= VERIFY PAYMENT =================
     @Override
     public void verifyPayment(
             String orderId,
             String paymentId,
             String signature
     ) {
-        // 1️⃣ Fetch payment
         Payment payment = paymentRepo.findByRazorpayOrderId(orderId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
-        // 2️⃣ IDEMPOTENCY CHECK
         if (payment.getStatus() == PaymentStatus.SUCCESS) {
             return;
         }
 
-        // 3️⃣ Verify Razorpay signature
         boolean isValid = RazorpaySignatureUtil.verify(
                 orderId,
                 paymentId,
@@ -99,13 +94,11 @@ public class PaymentServiceImpl implements PaymentService {
             throw new RuntimeException("Invalid Razorpay signature");
         }
 
-        // 4️⃣ Mark payment SUCCESS
         payment.setRazorpayPaymentId(paymentId);
         payment.setRazorpaySignature(signature);
         payment.setStatus(PaymentStatus.SUCCESS);
         paymentRepo.save(payment);
 
-        // 5️⃣ Perform business action
         switch (payment.getPaymentFor()) {
             case CAR_PURCHASE -> handleCarPurchase(payment);
             case SUBSCRIPTION -> handleSubscription(payment);
@@ -113,7 +106,6 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    // ================= HANDLERS =================
 
     private void handleCarPurchase(Payment payment) {
         Cart cart = cartRepo.findByUser(payment.getUser())
@@ -147,15 +139,12 @@ public class PaymentServiceImpl implements PaymentService {
         cart.getItems().clear();
     }
 
-    /**
-     * ✅ ASSIGN SUBSCRIPTION PLAN TO USER
-     */
+  
     private void handleSubscription(Payment payment) {
 
         SubscriptionPlan plan = planRepo.findById(payment.getReferenceId())
                 .orElseThrow(() -> new RuntimeException("Subscription plan not found"));
 
-        // ✅ Expire existing ACTIVE subscriptions
         List<UserSubscription> activeSubs =
                 userSubRepo.findByUserAndStatus(payment.getUser(), SubscriptionStatus.ACTIVE);
 
@@ -164,7 +153,6 @@ public class PaymentServiceImpl implements PaymentService {
             sub.setEndDate(LocalDateTime.now());
         }
 
-        // ✅ Create new subscription
         UserSubscription newSub = new UserSubscription();
         newSub.setUser(payment.getUser());
         newSub.setPlan(plan);

@@ -35,14 +35,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         SubscriptionPlan plan = planRepo.findByPlanName(planName)
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
 
-        // 🔥 Expire old subscriptions
         userSubRepo.deactivateActiveSubscriptions(
                 userId,
                 SubscriptionStatus.ACTIVE,
                 SubscriptionStatus.EXPIRED
         );
 
-        // 🔥 Create new subscription
         UserSubscription subscription = new UserSubscription();
         subscription.setUser(user);
         subscription.setPlan(plan);

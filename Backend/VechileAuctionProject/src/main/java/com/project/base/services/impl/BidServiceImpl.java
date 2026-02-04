@@ -37,13 +37,11 @@ public class BidServiceImpl implements BidService {
 
         BigDecimal bidAmountBD = BigDecimal.valueOf(bidAmount);
 
-        // 1️⃣ Validate buyer
         User buyer = userRepo.findById(buyerId)
                 .orElseThrow(() ->
                         new BidException("Buyer account not found.")
                 );
 
-        // 2️⃣ Validate ACTIVE subscription
         UserSubscription subscription = subscriptionRepo
                 .findAllByUserAndStatus(buyer, SubscriptionStatus.ACTIVE)
                 .stream()
@@ -54,7 +52,6 @@ public class BidServiceImpl implements BidService {
                         )
                 );
 
-        // 🔒 Extra safety (future-proof)
         if (subscription.getStatus() != SubscriptionStatus.ACTIVE) {
             throw new BidException(
                     "Your subscription has expired. Please renew to continue bidding."
@@ -67,13 +64,11 @@ public class BidServiceImpl implements BidService {
             );
         }
 
-        // 3️⃣ LOCK auction row (concurrency safe)
         Auction auction = auctionRepo.findByIdForUpdate(auctionId)
                 .orElseThrow(() ->
                         new BidException("Auction not found.")
                 );
 
-        // 4️⃣ Auction validations
         if (auction.getStatus() != AuctionStatus.ACTIVE) {
             throw new BidException("This auction is not active.");
         }
@@ -82,12 +77,10 @@ public class BidServiceImpl implements BidService {
             throw new BidException("This auction has already ended.");
         }
 
-        // 🚫 Seller cannot bid on own car
         if (auction.getCar().getSeller().getId().equals(buyerId)) {
             throw new BidException("You cannot bid on your own car.");
         }
 
-        // 5️⃣ Enforce bid limit per auction
         long userBidsInThisAuction =
                 bidRepo.countByAuctionAndBidder(auction, buyer);
 
@@ -97,7 +90,6 @@ public class BidServiceImpl implements BidService {
             );
         }
 
-        // 6️⃣ Highest bid validation
         BigDecimal highestBid = bidRepo
                 .findHighestBidAmount(auctionId)
                 .orElse(auction.getCurrentPrice());
@@ -108,7 +100,6 @@ public class BidServiceImpl implements BidService {
             );
         }
 
-        // 7️⃣ Save bid
         Bid bid = new Bid();
         bid.setAuction(auction);
         bid.setBidder(buyer);
@@ -116,11 +107,9 @@ public class BidServiceImpl implements BidService {
         bid.setBidTime(LocalDateTime.now());
         bidRepo.save(bid);
 
-        // 8️⃣ Update auction price
         auction.setCurrentPrice(bidAmountBD);
         auctionRepo.save(auction);
 
-        // 9️⃣ Decrease remaining bids
         subscription.setBidsRemaining(subscription.getBidsRemaining() - 1);
         subscriptionRepo.save(subscription);
     }

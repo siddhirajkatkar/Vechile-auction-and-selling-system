@@ -22,14 +22,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service; // ✅ CRITICAL IMPORT
 
 @Service
-@Transactional // Ensures database changes are committed
+@Transactional 
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private RoleRepository roleRepository; // Needed to fetch the Role object
+    private RoleRepository roleRepository; 
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -45,24 +45,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        // This feeds your React 'users' state
         return userRepository.findAll();
     }
 
     @Override
     public void promoteToAdmin(Long userId) {
-        // 1. Find user
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 2. Fetch Role entity (RoleName.ROLE_ADMIN matches your enum)
         Role adminRole = roleRepository.findByRoleName(RoleName.ROLE_ADMIN)
             .orElseThrow(() -> new RuntimeException("Role ROLE_ADMIN not found in database"));
 
-        // 3. Add Role object to the Set<Role> (Fixes your Type Mismatch error)
         user.getRoles().add(adminRole);
 
-        // 4. Save
         userRepository.save(user);
     }
 
@@ -86,7 +81,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String registerUser(UserDTO userDto) {
-        // Implement logic to map DTO to Entity and save
         return "User Registered";
     }
 }
