@@ -67,12 +67,12 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Cart cart = cartRepo.findByUser(user)
-                .orElse(new Cart()); // empty cart if none exists
+                .orElse(new Cart()); 
 
         List<CarResponseDTO> cars = cart.getItems().stream()
                 .map(item -> {
                     Car car = item.getCar();
-                    User seller = car.getSeller(); // fetch seller info
+                    User seller = car.getSeller(); 
 
                     return new CarResponseDTO(
                             car.getId(),
@@ -91,7 +91,7 @@ public class CartServiceImpl implements CartService {
                             item.getPriceAtAddTime(),
                             car.getDescription(),
                             car.getSaleType(),
-                            car.getImages(), // full CarImage entities
+                            car.getImages(), 
                             seller.getFirstName(),
                             seller.getEmail(),
                             seller.getPhone(),

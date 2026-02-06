@@ -36,7 +36,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // 1. Check header
         if (authHeader == null || authHeader.isBlank()) {
             System.out.println("⛔ No Authorization header found");
             filterChain.doFilter(request, response);
@@ -49,7 +48,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 2. Extract & clean token
         String jwt = authHeader.substring(7).replaceAll("\\s", "");
         System.out.println("✅ JWT extracted");
 

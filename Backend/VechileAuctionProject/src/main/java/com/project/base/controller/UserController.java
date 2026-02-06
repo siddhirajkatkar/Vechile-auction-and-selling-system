@@ -33,9 +33,7 @@ public class UserController {
     private final UserService userService;
     private final CarService carService;
 
-    // ===============================
-    // USER APIs
-    // ===============================
+   
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(
@@ -55,9 +53,7 @@ public class UserController {
         return "Server is running!";
     }
 
-    // ===============================
-    // CAR SELLING APIs
-    // ===============================
+  
 
     @PostMapping(
         value = "/cars/add",
@@ -72,7 +68,6 @@ public class UserController {
 
         log.info("🔥 ADD CAR API HIT");
 
-        // ✅ SAFELY FETCH LOGGED-IN USER FROM JWT
         User currentUser = userService.getCurrentUser();
         Long sellerId = currentUser.getId();
 

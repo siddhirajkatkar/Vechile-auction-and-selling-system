@@ -36,30 +36,22 @@ public class SecurityConfig {
     @Autowired
     private MyUserDetailsService userDetailsService;
 
-    // =========================
-    // SECURITY FILTER CHAIN
-    // =========================
+  
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // Enable CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-            // Disable CSRF (JWT based)
             .csrf(csrf -> csrf.disable())
 
-            // Stateless session
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // Authorization rules
             .authorizeHttpRequests(auth -> auth
 
-            	    // Public resources
             	    .requestMatchers("/uploads/**").permitAll()
             	    .requestMatchers("/api/cars/all").permitAll()
 
-            	    // Auth & docs
             	    .requestMatchers(
             	        "/api/auth/**",
             	        "/v3/api-docs/**",
@@ -67,31 +59,25 @@ public class SecurityConfig {
             	        "/swagger-ui.html"
             	    ).permitAll()
 
-            	    // 🔥 Razorpay callbacks ONLY
             	    .requestMatchers(
             	        "/user/payment/razorpay/verify",
             	        "/user/subscription/razorpay/verify"
             	    ).permitAll()
 
-            	    // Everything else requires JWT
             	    .anyRequest().authenticated()
             	)
 
 
-            // Disable default login mechanisms 🚫
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
 
-            // JWT filter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
 
-    // =========================
-    // AUTHENTICATION MANAGER
-    // =========================
+  
     @Bean
     public AuthenticationManager authenticationManager(
             HttpSecurity http,
@@ -107,17 +93,13 @@ public class SecurityConfig {
         return authBuilder.build();
     }
 
-    // =========================
-    // PASSWORD ENCODER
-    // =========================
+   
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // =========================
-    // CORS CONFIGURATION
-    // =========================
+    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 

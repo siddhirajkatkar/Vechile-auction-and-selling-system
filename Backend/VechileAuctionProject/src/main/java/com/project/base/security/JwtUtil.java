@@ -26,14 +26,12 @@ public class JwtUtil {
 
     private Key jwtKey;
 
-    // 🔑 Initialize signing key using Base64 Decoder
     @PostConstruct
     public void init() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         this.jwtKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 🔐 Generate JWT Token
     public String generateToken(Authentication authentication) {
         MyUserDetails user = (MyUserDetails) authentication.getPrincipal();
 
@@ -50,12 +48,10 @@ public class JwtUtil {
                 .compact();
     }
 
-    // 🔍 Extract username (email) from token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // ✅ Validate token
     public boolean isTokenValid(String token) {
         try {
             extractAllClaims(token);
@@ -78,7 +74,6 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    // 🔓 Parse claims using the same jwtKey
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(jwtKey)

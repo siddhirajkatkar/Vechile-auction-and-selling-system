@@ -37,18 +37,13 @@ public class CarServiceImpl implements CarService {
     private final ImageStorageService imageStorageService;
     private final RoleRepository roleRepository;
 
-    // ================= SELLER =================
-
-    /**
-     * Seller adds a car → saved as DRAFT
-     */
+ 
     @Override
     public Car addNewCar(CarDto carDto, MultipartFile[] images, Long sellerId) {
 
         User user = userRepo.findById(sellerId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ✅ ADD SELLER ROLE IF NOT PRESENT
         boolean isSeller = user.getRoles().stream()
                 .anyMatch(role -> role.getRoleName() == RoleName.ROLE_SELLER);
 
@@ -100,10 +95,6 @@ public class CarServiceImpl implements CarService {
 
 
 
-
-    /**
-     * Seller submits car for admin approval
-     */
     @Override
     public void submitForApproval(Long carId, Long sellerId) {
 
@@ -122,7 +113,6 @@ public class CarServiceImpl implements CarService {
         carRepo.save(car);
     }
 
-    // ================= ADMIN =================
 
     @Override
     public List<CarResponseDTO> getPendingCars() {
@@ -160,7 +150,6 @@ public class CarServiceImpl implements CarService {
         return carRepo.save(car);
     }
 
-    // ================= BUYER / PUBLIC =================
 
     @Override
     public List<CarResponseDTO> getAllAvailableCars() {
@@ -178,7 +167,6 @@ public class CarServiceImpl implements CarService {
                 .collect(Collectors.toList());
     }
 
-    // ================= ENTITY → DTO =================
 
     private CarResponseDTO convertToDto(Car car) {
 
@@ -205,7 +193,7 @@ public class CarServiceImpl implements CarService {
         
         User seller = car.getSeller();
         if (seller != null) {
-            dto.setSellerName(seller.getFirstName()+" "+seller.getLastName());  // change if field name different
+            dto.setSellerName(seller.getFirstName()+" "+seller.getLastName());  
             dto.setSellerEmail(seller.getEmail());
             dto.setSellerPhone(seller.getPhone());
         }

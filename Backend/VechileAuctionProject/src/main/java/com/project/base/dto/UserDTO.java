@@ -34,5 +34,5 @@ public class UserDTO {
 
     private String address;
 
-    private Set<String> roles; // e.g., ["ROLE_BUYER"]
+    private Set<String> roles; 
 }

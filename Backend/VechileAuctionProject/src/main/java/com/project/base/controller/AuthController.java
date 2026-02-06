@@ -56,7 +56,6 @@ public class AuthController {
 
             String token = jwtUtil.generateToken(auth);
 
-            // 🔎 VERY IMPORTANT DEBUG
             log.info("🎟️ JWT TOKEN = {}", token);
             log.info("🎟️ JWT PARTS = {}", token.split("\\.").length);
 
@@ -100,10 +99,8 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
 
-        // 1️⃣ Encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // 2️⃣ FORCE DEFAULT ROLE = ROLE_BUYER
         Role buyerRole = roleRepository
                 .findByRoleName(RoleName.ROLE_BUYER)
                 .orElseThrow(() ->
@@ -114,7 +111,6 @@ public class AuthController {
         roles.add(buyerRole);
         user.setRoles(roles);
 
-        // 3️⃣ Save user
         userRepo.save(user);
 
         return ResponseEntity.ok(

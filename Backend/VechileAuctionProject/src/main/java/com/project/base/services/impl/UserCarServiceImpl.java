@@ -31,10 +31,7 @@ public class UserCarServiceImpl implements UserCarService{
 	    @Autowired
 	    private ImageStorageService carImageService;
 
-//	    @Override
-//	    public Car addNewCar(CarDto carDto, MultipartFile[] images, Long sellerId) {
-//	        // existing addNewCar code...
-//	    }
+
 
 	    @Override
 	    public List<CarResponseDTO> getCarsBySeller(Long sellerId) {
@@ -69,7 +66,7 @@ public class UserCarServiceImpl implements UserCarService{
 	            
 	            User seller = car.getSeller();
 	            if (seller != null) {
-	                dto.setSellerName(seller.getFirstName()+" "+seller.getLastName());// change if field name different
+	                dto.setSellerName(seller.getFirstName()+" "+seller.getLastName());
 	                dto.setSellerEmail(seller.getEmail());
 	                dto.setSellerPhone(seller.getPhone());
 	            }
@@ -81,16 +78,13 @@ public class UserCarServiceImpl implements UserCarService{
 
 	    @Override
 	    public ApiResponse deleteCar(Long carId, Long sellerId) {
-	        // Fetch car
 	        Car car = carRepo.findById(carId)
 	                .orElseThrow(() -> new RuntimeException("Car not found"));
 
-	        // Check if the current user is the seller
 	        if (!car.getSeller().getId().equals(sellerId)) {
 	            throw new RuntimeException("You are not authorized to delete this car");
 	        }
 
-	        // Delete the car (images will be deleted due to cascade)
 	        carRepo.delete(car);
 	        return new ApiResponse("Car Deleted Successfully");
 	    }

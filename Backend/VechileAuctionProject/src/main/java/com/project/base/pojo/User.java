@@ -15,17 +15,13 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "users")
-@NoArgsConstructor // JPA requirement
+@NoArgsConstructor 
 @AllArgsConstructor
 @Getter
 @Setter
 @AttributeOverride(name="id",column = @Column(name="user_id"))
 public class User extends BaseEntity {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "user_id")
-//    private Long userId;
 
     @Column(name = "first_name", length = 100)
     private String firstName;
@@ -58,15 +54,12 @@ public class User extends BaseEntity {
     @Column(name = "status")
     private UserStatus status = UserStatus.ACTIVE;
 
-//    @Column(name = "created_at", updatable = false)
-//    private LocalDateTime createdAt;
     
     @OneToMany(mappedBy = "bidder", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Bid> bids;
 
 
-    //Business constructor (User Registration)
     public User(String firstName,
                 String lastName,
                 String email,
@@ -82,14 +75,10 @@ public class User extends BaseEntity {
         this.address = address;
     }
 
-   // login constructor
     public User(String email, String password) {
         this.email = email;
         this.password = password;
     }
 
-//    @PrePersist
-//    protected void onCreate() {
-//        this.createdAt = LocalDateTime.now();
-//    }
+
 }

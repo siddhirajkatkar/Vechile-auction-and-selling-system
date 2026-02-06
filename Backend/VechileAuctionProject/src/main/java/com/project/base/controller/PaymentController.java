@@ -18,9 +18,7 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    // =========================
-    // CREATE ORDER (JWT REQUIRED)
-    // =========================
+   
     @PostMapping("/create-order")
     public ResponseEntity<Payment> createOrder(
             @RequestParam Double amount,
@@ -29,10 +27,7 @@ public class PaymentController {
             @AuthenticationPrincipal MyUserDetails user
     ) throws Exception {
 
-        /*
-         * paymentFor = SUBSCRIPTION
-         * referenceId = planId
-         */
+      
         Payment payment = paymentService.createOrder(
                 amount,
                 user.getUser().getId(),
@@ -43,20 +38,12 @@ public class PaymentController {
         return ResponseEntity.ok(payment);
     }
 
-    // =========================
-    // VERIFY PAYMENT
-    // =========================
+   
     @PostMapping("/razorpay/verify")
     public ResponseEntity<String> verifyPayment(
             @Valid @RequestBody PaymentVerifyDto dto
     ) {
-        /*
-         * This method will:
-         * 1. Verify Razorpay signature
-         * 2. Mark payment SUCCESS
-         * 3. ASSIGN PLAN TO USER (if paymentFor == SUBSCRIPTION)
-         * 4. Finalize auction (if paymentFor == AUCTION)
-         */
+       
         paymentService.verifyPayment(
                 dto.getRazorpayOrderId(),
                 dto.getRazorpayPaymentId(),

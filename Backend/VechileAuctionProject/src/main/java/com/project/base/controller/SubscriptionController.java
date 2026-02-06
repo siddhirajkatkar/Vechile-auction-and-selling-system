@@ -27,9 +27,7 @@ public class SubscriptionController {
     @Autowired
     private UserService userService;
 
-    // ===============================
-    // VIEW ALL AVAILABLE PLANS
-    // ===============================
+    
     @GetMapping("/plans")
     public ResponseEntity<List<SubscriptionPlan>> viewPlans() {
         return ResponseEntity.ok(
@@ -37,9 +35,7 @@ public class SubscriptionController {
         );
     }
 
-    // ===============================
-    // BUYER SUBSCRIBES TO A PLAN
-    // ===============================
+    
     @PostMapping("/buy/{planName}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER','ROLE_SELLER')")
     public ResponseEntity<UserSubscription> buyPlan(
@@ -51,9 +47,7 @@ public class SubscriptionController {
         );
     }
 
-    // ===============================
-    // VIEW CURRENT USER SUBSCRIPTION
-    // ===============================
+    
     @GetMapping("/me")
     @PreAuthorize("hasAuthority('ROLE_BUYER') or hasAuthority('ROLE_SELLER')")  
     public ResponseEntity<UserSubscription> mySubscription() {

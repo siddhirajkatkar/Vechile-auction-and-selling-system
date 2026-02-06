@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Getter
 public class MyUserDetails implements UserDetails {
 
-    private final User user; // Reference to your Entity
+    private final User user; 
 
     public MyUserDetails(User user) {
         this.user = user;

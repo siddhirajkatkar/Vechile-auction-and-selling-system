@@ -20,5 +20,5 @@ public class CartItem extends BaseEntity {
     @JoinColumn(name = "car_id")
     private Car car;
 
-    private double priceAtAddTime; // safety if car price changes 
+    private double priceAtAddTime; 
 }

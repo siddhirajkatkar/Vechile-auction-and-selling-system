@@ -26,11 +26,8 @@ public class UserCarController {
     @Autowired
     private UserService userService;
 
-    // =========================
-    // Get cars listed by the current seller
-    // =========================
+    
     @GetMapping("/mine")
-//    @PreAuthorize("hasRole('SELLER')") // Only sellers can access
     public ResponseEntity<List<CarResponseDTO>> getMyCars() {
         Long sellerId = userService.getCurrentUser().getId();
         List<CarResponseDTO> cars = userCarService.getCarsBySeller(sellerId);
@@ -39,7 +36,7 @@ public class UserCarController {
     
     @DeleteMapping("/{carId}")
     public ResponseEntity<String> deleteCar(@PathVariable Long carId) {
-        Long sellerId = userService.getCurrentUser().getId(); // get current logged-in seller
+        Long sellerId = userService.getCurrentUser().getId(); 
         userCarService.deleteCar(carId, sellerId);
         return ResponseEntity.ok("Car deleted successfully");
     }
