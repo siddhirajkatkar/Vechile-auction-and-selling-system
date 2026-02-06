@@ -38,13 +38,14 @@ public class AuctionServiceImpl implements AuctionService {
  
     @Override
     @Transactional(readOnly = true)
-    public List<AuctionResponseDTO> viewActiveAuctions(Long userId) {
+    public List<AuctionResponseDTO> viewActiveAuctions() {
 
         return auctionRepo.findByStatus(AuctionStatus.ACTIVE)
                 .stream()
                 .map(this::mapToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
+
 
     @Override
     @Transactional(readOnly = true)

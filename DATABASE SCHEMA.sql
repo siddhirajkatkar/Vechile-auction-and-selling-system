@@ -1,160 +1,196 @@
--- =========================================
--- CAR AUCTION & CAR MART DATABASE
--- =========================================
+-- ================================
+-- USERS & ROLES
+-- ================================
 
-CREATE DATABASE IF NOT EXISTS car_auction_mart;
-USE car_auction_mart;
-
--- =========================================
--- ROLES
--- =========================================
-CREATE TABLE roles (
-    role_id INT AUTO_INCREMENT PRIMARY KEY,
-    role_name VARCHAR(50) UNIQUE NOT NULL
+CREATE TABLE users (
+    user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    phone VARCHAR(15),
+    address VARCHAR(255),
+    status ENUM('ACTIVE','INACTIVE'),
+    created_on DATE,
+    last_updated DATE
 );
 
--- =========================================
--- USERS
--- =========================================
-CREATE TABLE users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    phone VARCHAR(15),
-    role_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE roles (
+    role_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    role_name ENUM('ROLE_ADMIN','ROLE_BUYER','ROLE_SELLER') NOT NULL UNIQUE
+);
+
+CREATE TABLE user_roles (
+    user_id BIGINT NOT NULL,
+    role_id BIGINT NOT NULL,
+    PRIMARY KEY (user_id, role_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 
--- =========================================
--- CARS (CORE TABLE)
--- =========================================
+-- ================================
+-- CARS & IMAGES
+-- ================================
+
 CREATE TABLE cars (
-    car_id INT AUTO_INCREMENT PRIMARY KEY,
-    seller_id INT NOT NULL,
-    brand VARCHAR(50),
-    model VARCHAR(50),
-    manufacture_year INT,
-    fuel_type ENUM('PETROL','DIESEL','ELECTRIC','HYBRID'),
-    transmission ENUM('MANUAL','AUTOMATIC'),
+    car_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    brand VARCHAR(50) NOT NULL,
+    model VARCHAR(50) NOT NULL,
+    manufacturer VARCHAR(255) NOT NULL,
+    registration_no VARCHAR(20) NOT NULL UNIQUE,
+    price DOUBLE NOT NULL,
     mileage INT,
-    color VARCHAR(30),
+    km_driven INT NOT NULL,
     engine_cc INT,
-    price DECIMAL(10,2),
+    fuel_type ENUM('DIESEL','ELECTRIC','HYBRID','PETROL') NOT NULL,
+    transmission ENUM('AUTOMATIC','MANUAL') NOT NULL,
+    color VARCHAR(30),
     description TEXT,
+    manufacture_year INT,
     sale_type ENUM('AUCTION','DIRECT') NOT NULL,
-    status ENUM('AVAILABLE','SOLD','UNDER_AUCTION') DEFAULT 'AVAILABLE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM(
+        'DRAFT','PENDING_APPROVAL','AVAILABLE',
+        'UNDER_AUCTION','AUCTION_COMPLETED',
+        'SOLD','CANCELLED'
+    ) NOT NULL,
+    auction_attempts INT NOT NULL,
+    last_auction_ended_at DATETIME(6),
+    seller_id BIGINT NOT NULL,
+    created_on DATE,
+    last_updated DATE,
     FOREIGN KEY (seller_id) REFERENCES users(user_id)
 );
 
--- =========================================
--- CAR IMAGES
--- =========================================
 CREATE TABLE car_images (
-    image_id INT AUTO_INCREMENT PRIMARY KEY,
-    car_id INT NOT NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
     image_url VARCHAR(255) NOT NULL,
-    FOREIGN KEY (car_id) REFERENCES cars(car_id) ON DELETE CASCADE
-);
-
--- =========================================
--- AUCTIONS
--- =========================================
-CREATE TABLE auctions (
-    auction_id INT AUTO_INCREMENT PRIMARY KEY,
-    car_id INT UNIQUE NOT NULL,
-    start_price DECIMAL(10,2) NOT NULL,
-    current_price DECIMAL(10,2),
-    start_time DATETIME NOT NULL,
-    end_time DATETIME NOT NULL,
-    status ENUM('ACTIVE','COMPLETED','CANCELLED') DEFAULT 'ACTIVE',
-    FOREIGN KEY (car_id) REFERENCES cars(car_id) ON DELETE CASCADE
-);
-
--- =========================================
--- BIDS
--- =========================================
-CREATE TABLE bids (
-    bid_id INT AUTO_INCREMENT PRIMARY KEY,
-    auction_id INT NOT NULL,
-    bidder_id INT NOT NULL,
-    bid_amount DECIMAL(10,2) NOT NULL,
-    bid_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (auction_id) REFERENCES auctions(auction_id) ON DELETE CASCADE,
-    FOREIGN KEY (bidder_id) REFERENCES users(user_id)
-);
-
--- =========================================
--- CART (DIRECT PURCHASE)
--- =========================================
-CREATE TABLE cart (
-    cart_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    car_id INT NOT NULL,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (car_id) REFERENCES cars(car_id) ON DELETE CASCADE
-);
-
--- =========================================
--- ORDERS
--- =========================================
-CREATE TABLE orders (
-    order_id INT AUTO_INCREMENT PRIMARY KEY,
-    buyer_id INT NOT NULL,
-    car_id INT NOT NULL,
-    order_type ENUM('AUCTION','DIRECT') NOT NULL,
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    amount DECIMAL(10,2) NOT NULL,
-    status ENUM('PENDING','PAID','CANCELLED','DELIVERED') DEFAULT 'PENDING',
-    FOREIGN KEY (buyer_id) REFERENCES users(user_id),
+    car_id BIGINT NOT NULL,
     FOREIGN KEY (car_id) REFERENCES cars(car_id)
 );
 
--- =========================================
--- PAYMENTS
--- =========================================
-CREATE TABLE payments (
-    payment_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    payment_method VARCHAR(50),
-    payment_status ENUM('SUCCESS','FAILED','PENDING'),
-    transaction_id VARCHAR(100),
-    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+-- ================================
+-- AUCTIONS & BIDS
+-- ================================
+
+CREATE TABLE auctions (
+    auction_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    start_price DECIMAL(10,2) NOT NULL,
+    current_price DECIMAL(10,2),
+    start_time DATETIME(6) NOT NULL,
+    end_time DATETIME(6) NOT NULL,
+    status ENUM('ACTIVE','COMPLETED') NOT NULL,
+    paid BIT(1) NOT NULL,
+    payment_status ENUM('CREATED','FAILED','SUCCESS'),
+    payment_time DATETIME(6),
+    car_id BIGINT NOT NULL UNIQUE,
+    winner_id BIGINT,
+    created_on DATE,
+    last_updated DATE,
+    FOREIGN KEY (car_id) REFERENCES cars(car_id),
+    FOREIGN KEY (winner_id) REFERENCES users(user_id)
 );
 
--- =========================================
--- REVIEWS
--- =========================================
-CREATE TABLE reviews (
-    review_id INT AUTO_INCREMENT PRIMARY KEY,
-    car_id INT NOT NULL,
-    user_id INT NOT NULL,
-    rating INT CHECK (rating BETWEEN 1 AND 5),
-    comment TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (car_id) REFERENCES cars(car_id) ON DELETE CASCADE,
+CREATE TABLE bids (
+    bid_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    bid_amount DECIMAL(10,2) NOT NULL,
+    bid_time DATETIME(6) NOT NULL,
+    auction_id BIGINT NOT NULL,
+    bidder_id BIGINT NOT NULL,
+    FOREIGN KEY (auction_id) REFERENCES auctions(auction_id),
+    FOREIGN KEY (bidder_id) REFERENCES users(user_id)
+);
+
+-- ================================
+-- CART & CART ITEMS
+-- ================================
+
+CREATE TABLE cart (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL UNIQUE,
+    created_on DATE,
+    last_updated DATE,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
--- =========================================
--- WISHLIST
--- =========================================
-CREATE TABLE wishlist (
-    wishlist_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    car_id INT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (car_id) REFERENCES cars(car_id) ON DELETE CASCADE
+CREATE TABLE cart_items (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    cart_id BIGINT,
+    car_id BIGINT,
+    price_at_add_time DOUBLE NOT NULL,
+    created_on DATE,
+    last_updated DATE,
+    FOREIGN KEY (cart_id) REFERENCES cart(id),
+    FOREIGN KEY (car_id) REFERENCES cars(car_id)
 );
 
--- =========================================
--- DEFAULT ROLES
--- =========================================
-INSERT INTO roles (role_name) VALUES
-('ADMIN'),
-('SELLER'),
-('BUYER');
+-- ================================
+-- ORDERS & ORDER ITEMS
+-- ================================
+
+CREATE TABLE orders (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    order_time DATETIME(6),
+    total_amount DOUBLE NOT NULL,
+    status ENUM('PENDING','SUCCESS','FAILED'),
+    payment_id BIGINT UNIQUE,
+    user_id BIGINT NOT NULL,
+    created_on DATE,
+    last_updated DATE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE order_items (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    order_id BIGINT,
+    car_id BIGINT,
+    brand VARCHAR(255),
+    model VARCHAR(255),
+    price_at_purchase DOUBLE NOT NULL,
+    created_on DATE,
+    last_updated DATE,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (car_id) REFERENCES cars(car_id)
+);
+
+-- ================================
+-- PAYMENTS
+-- ================================
+
+CREATE TABLE payments (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    amount DOUBLE,
+    payment_for ENUM('AUCTION_WIN','CAR_PURCHASE','SUBSCRIPTION'),
+    status ENUM('CREATED','FAILED','SUCCESS'),
+    razorpay_order_id VARCHAR(255),
+    razorpay_payment_id VARCHAR(255),
+    razorpay_signature VARCHAR(255),
+    reference_id BIGINT,
+    user_id BIGINT,
+    payment_time DATETIME(6),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- ================================
+-- SUBSCRIPTIONS
+-- ================================
+
+CREATE TABLE subscription_plans (
+    plan_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    plan_name ENUM('BASIC','PREMIUM') NOT NULL UNIQUE,
+    price DOUBLE NOT NULL,
+    total_bids INT,
+    bids_per_auction INT,
+    validity_days INT NOT NULL
+);
+
+CREATE TABLE user_subscriptions (
+    subscription_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    plan_id BIGINT NOT NULL,
+    bids_remaining INT,
+    start_date DATETIME(6),
+    end_date DATETIME(6),
+    status ENUM('ACTIVE','EXPIRED') NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)
+);

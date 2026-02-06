@@ -7,7 +7,7 @@ import com.project.base.pojo.User;
 
 public interface AuctionService {
 
-    List<AuctionResponseDTO> viewActiveAuctions(Long userId);
+    List<AuctionResponseDTO> viewActiveAuctions();
 
     AuctionResponseDTO getAuctionById(Long auctionId);
 

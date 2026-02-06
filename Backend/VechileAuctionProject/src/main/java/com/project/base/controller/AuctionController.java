@@ -28,12 +28,11 @@ public class AuctionController {
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER','ROLE_SELLER','ROLE_ADMIN')")
     public ResponseEntity<List<AuctionResponseDTO>> viewAuctions() {
 
-        Long userId = userService.getCurrentUser().getId();
-
         return ResponseEntity.ok(
-                auctionService.viewActiveAuctions(userId)
+                auctionService.viewActiveAuctions()
         );
     }
+
 
     @GetMapping("/{auctionId}")
     @PreAuthorize("hasAuthority('ROLE_BUYER') or hasAuthority('ROLE_SELLER')")
