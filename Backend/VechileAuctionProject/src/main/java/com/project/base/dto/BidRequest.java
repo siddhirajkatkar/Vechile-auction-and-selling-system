@@ -1,14 +1,13 @@
 package com.project.base.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class BidRequest {
 
     private double bidAmount;
 
-    public double getBidAmount() {
-        return bidAmount;
-    }
-
-    public void setBidAmount(double bidAmount) {
-        this.bidAmount = bidAmount;
-    }
+    
 }

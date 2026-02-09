@@ -70,9 +70,9 @@ public class AuctionServiceImpl implements AuctionService {
             throw new RuntimeException("You are not the owner of this car");
         }
 
-//        if (car.getStatus() != Status.AVAILABLE) {
-//            throw new RuntimeException("Car must be approved before auction");
-//        }
+        if (car.getStatus() != Status.AVAILABLE) {
+            throw new RuntimeException("Car must be approved before auction");
+      }
 
         if (car.getAuctionAttempts() >= 3) {
             throw new RuntimeException("Maximum auction attempts reached");
@@ -170,7 +170,6 @@ public class AuctionServiceImpl implements AuctionService {
         dto.setEndTime(auction.getEndTime());
         dto.setStatus(auction.getStatus().name());
 
-        // 🔥 ADD THIS BLOCK (WINNER LOGIC)
         if (auction.getStatus() == AuctionStatus.COMPLETED) {
 
             Bid topBid =

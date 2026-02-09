@@ -47,25 +47,20 @@ public class SecurityConfig {
 
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .authorizeHttpRequests(auth -> auth
 
-            	    .requestMatchers("/uploads/**").permitAll()
-            	    .requestMatchers("/api/cars/all").permitAll()
-
-            	    .requestMatchers(
-            	        "/api/auth/**",
-            	        "/v3/api-docs/**",
-            	        "/swagger-ui/**",
-            	        "/swagger-ui.html"
-            	    ).permitAll()
-
-            	    .requestMatchers(
-            	        "/user/payment/razorpay/verify",
-            	        "/user/subscription/razorpay/verify"
-            	    ).permitAll()
-
-            	    .anyRequest().authenticated()
-            	)
+            		.authorizeHttpRequests(auth -> auth
+            			    .requestMatchers(
+            			        "/uploads/**",
+            			        "/api/cars/all",
+            			        "/api/auth/**",
+            			        "/v3/api-docs/**",
+            			        "/swagger-ui/**",
+            			        "/swagger-ui.html",
+            			        "/user/payment/razorpay/verify",
+            			        "/user/subscription/razorpay/verify"
+            			    ).permitAll()
+            			    .anyRequest().authenticated()
+            			)
 
 
             .formLogin(form -> form.disable())
@@ -105,8 +100,12 @@ public class SecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(List.of(
+        	    "http://localhost:5173",
+        	    "http://16.171.77.14:5173"
+        	));
+
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
