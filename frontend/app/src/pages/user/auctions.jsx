@@ -11,7 +11,6 @@ const statusColor = {
 const Auctions = () => {
   const navigate = useNavigate();
 
-  // UI-only username (safe default)
   const username = localStorage.getItem("username") || "User";
 
   const [auctions, setAuctions] = useState([]);
@@ -36,7 +35,6 @@ const Auctions = () => {
     }
   };
 
-  // ⏳ Remaining time helper
   const remainingTime = (endTime) => {
     if (!endTime) return "N/A";
     const diff = new Date(endTime) - new Date();
@@ -47,7 +45,6 @@ const Auctions = () => {
     return hrs > 0 ? `${hrs}h ${mins % 60}m left` : `${mins}m left`;
   };
 
-  // 🔄 Loading state
   if (loading) {
     return (
       <div className="text-center mt-5">
@@ -57,7 +54,6 @@ const Auctions = () => {
     );
   }
 
-  // ❌ Error state
   if (error) {
     return (
       <div className="text-center mt-5 text-danger fw-bold">
@@ -68,11 +64,8 @@ const Auctions = () => {
 
   return (
     <div className="min-vh-100" style={{ backgroundColor: "#f8f9fa" }}>
-
-      {/* HEADER */}
       <div className="bg-white border-bottom shadow-sm sticky-top">
         <div className="container py-3 d-flex justify-content-between align-items-center">
-
           <div>
             <button
               className="btn btn-outline-secondary btn-sm rounded-pill mb-2"
@@ -98,14 +91,10 @@ const Auctions = () => {
               <div className="small text-muted">Buyer Dashboard</div>
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* CONTENT */}
       <div className="container my-5">
-
-        {/* Gradient Banner */}
         <div
           className="p-4 mb-5 rounded-4 text-white shadow-sm"
           style={{
@@ -118,7 +107,6 @@ const Auctions = () => {
           </p>
         </div>
 
-        {/* No auctions */}
         {auctions.length === 0 ? (
           <div className="text-center text-muted">
             <h5>No auctions available</h5>
@@ -127,13 +115,9 @@ const Auctions = () => {
         ) : (
           <div className="row g-4">
             {auctions.map((auction) => (
-              <div
-                key={auction.auctionId}
-                className="col-md-6 col-lg-4"
-              >
+              <div key={auction.auctionId} className="col-md-6 col-lg-4">
                 <div className="card h-100 shadow-sm border-0 rounded-4 auction-card">
                   <div className="card-body d-flex flex-column">
-
                     <h5 className="fw-bold mb-2">
                       🚗 {auction.brand} {auction.model}
                     </h5>
@@ -163,7 +147,6 @@ const Auctions = () => {
                     >
                       View Auction →
                     </Link>
-
                   </div>
                 </div>
               </div>
@@ -172,7 +155,6 @@ const Auctions = () => {
         )}
       </div>
 
-      {/* STYLES */}
       <style>{`
         .auction-card {
           transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -182,7 +164,6 @@ const Auctions = () => {
           box-shadow: 0 12px 28px rgba(0,0,0,0.12);
         }
       `}</style>
-
     </div>
   );
 };

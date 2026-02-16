@@ -35,7 +35,7 @@ export const startPayment = async ({
       theme: { color: "#0d6efd" },
     };
 
-    const rzp = new window.Razorpay(options); // 🔹 This is now safe
+    const rzp = new window.Razorpay(options); 
     rzp.open();
 
   } catch (err) {
